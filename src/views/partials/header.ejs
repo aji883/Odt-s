@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title != 'undefined' ? title : "Odt's - OOTD Style" %></title>
+    <link rel="stylesheet" href="/css/halamanstyle.css">
+</head>
+<body class="<%= typeof bodyClass != 'undefined' ? bodyClass : '' %>">
+    <header class="main-header">
+        <nav class="navbar">
+            <a href="/" class="nav-logo">Odt's</a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="/user/profile" class="nav-link">Profile</a></li>
+                <li class="nav-item"><a href="/items" class="nav-link">Explore</a></li>
+                <li class="nav-item"><a href="/auth/login" class="nav-link">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="container">

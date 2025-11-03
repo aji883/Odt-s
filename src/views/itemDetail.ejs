@@ -1,0 +1,55 @@
+<%- include('partials/header', { title: title, bodyClass: typeof bodyClass != 'undefined' ? bodyClass : '' }) %>
+
+<div class="item-detail-container">
+    <div class="item-detail-image">
+        <img src="/<%= item.image_url %>" alt="<%= item.title %>">
+    </div>
+    <div class="item-detail-info">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+            <h1><%= item.title %></h1>
+
+            <div class="favorite-section">
+                <% if (!isOwner) { %>
+                    <form action="/items/<%= item.id %>/favorite" method="POST" class="favorite-form">
+                        <button type="submit" class="btn-favorite <%= typeof item.isFavorited != 'undefined' && item.isFavorited ? 'favorited' : '' %>">⭐</button>
+                    </form>
+                <% } %>
+                <span class="favorite-count">
+                    <%= item.favorite_count %> disukai
+                </span>
+            </div>
+            </div>
+        <p class="item-owner">Oleh: <a href="#"><%= item.owner_username %></a></p> <div class="item-meta">
+            <span><strong>Kategori:</strong> <%= item.category %></span> |
+            <span><strong>Ukuran:</strong> <%= item.size %></span> |
+            <span><strong>Status:</strong> <%= item.status %></span>
+            <% if(item.status === 'Dijual' && item.price) { %>
+                | <span><strong>Harga:</strong> Rp <%= item.price.toLocaleString('id-ID') %></span>
+            <% } %>
+        </div>
+
+        <div class="item-description">
+            <h3>Deskripsi</h3>
+            <p><%- item.description %></p>
+        </div>
+
+        <div class="item-actions">
+             <% if (isOwner) { %>
+                <form action="/items/<%= item.id %>/edit">
+                    <button class="btn btn-primary">Edit</button>
+                </form>
+
+                <form action="/items/<%= item.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus item ini?');">
+                    <button type="submit" class="btn btn-danger">Hapus Item</button>
+                </form>
+            <% } else { %>
+                <% if (item.status === 'Dijual' || item.status === 'Bisa di-Swap') { %>
+                    <a href="/items/<%= item.id %>/offer" class="btn btn-primary">Ajukan Tawaran</a> <% } else { %>
+                    <p><em>Item ini hanya untuk dipamerkan.</em></p>
+                 <% } %>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

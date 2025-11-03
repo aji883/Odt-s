@@ -1,0 +1,68 @@
+<%- include('partials/header', { title: title }) %>
+
+<div class="form-container">
+    <h2>Edit Item</h2>
+    <p>Perbarui detail untuk item: <%= item.title %></p>
+
+    <form action="/items/<%= item.id %>/edit" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Judul Item</label>
+            <input type="text" id="title" name="title" value="<%= item.title %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Deskripsi</label>
+            <textarea id="description" name="description" rows="4"><%= item.description %></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="category">Kategori</label>
+            <select id="category" name="category" class="form-control">
+                <option value="Atasan" <%= item.category === 'Atasan' ? 'selected' : '' %>>Atasan</option>
+                <option value="Bawahan" <%= item.category === 'Bawahan' ? 'selected' : '' %>>Bawahan</option>
+                <option value="Jaket" <%= item.category === 'Jaket' ? 'selected' : '' %>>Jaket</option>
+                <option value="Dress" <%= item.category === 'Dress' ? 'selected' : '' %>>Dress</option>
+                <option value="Aksesoris" <%= item.category === 'Aksesoris' ? 'selected' : '' %>>Aksesoris</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="size">Ukuran</label>
+            <input type="text" id="size" name="size" value="<%= item.size %>" required>
+        </div>
+
+        <div class="form-group">
+            <label>Status Item</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="status" value="Hanya Pamer" <%= item.status === 'Hanya Pamer' ? 'checked' : '' %>> Hanya Pamer
+                </label>
+                <label>
+                    <input type="radio" name="status" value="Bisa di-Swap" <%= item.status === 'Bisa di-Swap' ? 'checked' : '' %>> Bisa di-Swap
+                </label>
+                <label>
+                    <input type="radio" name="status" value="Dijual" <%= item.status === 'Dijual' ? 'checked' : '' %>> Dijual
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Harga (kosongkan jika tidak dijual)</label>
+            <input type="number" id="price" name="price" value="<%= item.price || '' %>">
+        </div>
+
+        <div class="form-group">
+            <label for="itemImage">Ganti Foto Item (Opsional)</label>
+            <input type="file" id="itemImage" name="itemImage">
+            <small>Kosongkan jika tidak ingin mengganti gambar.</small>
+            <% if (item.image_url) { %>
+                <p>Gambar saat ini:</p>
+                <img src="/<%= item.image_url %>" alt="Gambar saat ini" style="max-width: 150px; height: auto; margin-top: 10px;">
+            <% } %>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+    </form>
+</div>
+
+<%- include('partials/footer') %>

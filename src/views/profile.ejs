@@ -1,0 +1,62 @@
+<%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
+
+<div class="profile-container">
+
+    <aside class="profile-sidebar">
+        <div class="user-info">
+            <div class="user-avatar"></div>
+            <h2 class="user-name"><%= username %></h2>
+            <p class="user-email"><%= typeof email != 'undefined' ? email : 'email@pengguna.com' %></p>
+        </div>
+        <nav class="profile-nav">
+            <a href="/items/new" class="nav-button">
+                <span>➕</span> Tambah Item Baru
+            </a>
+            <a href="/user/profile" class="nav-button active">
+                <span>👕</span> Koleksi Saya
+            </a>
+            <a href="#" class="nav-button">
+                <span>⭐</span> Item Favorit
+            </a>
+            <a href="#" class="nav-button">
+                <span>✏️</span> Edit Profil
+            </a>
+            <a href="/auth/logout" class="nav-button">
+                <span>🚪</span> Logout
+            </a>
+        </nav>
+    </aside>
+
+    <div class="profile-main">
+        <div class="main-header-block">
+            <h1>LemaRI-ku</h1>
+            <p>Kelola semua koleksi OOTD Anda di sini.</p>
+        </div>
+
+        <div class="items-grid">
+            <% if(items && items.length > 0) { %>
+                <% items.forEach(item => { %>
+                    <div class="item-card">
+                         <a href="/items/<%= item.id %>" style="text-decoration: none; color: inherit;">
+                            <img src="/<%= item.image_url %>" alt="<%= item.title %>" class="item-image">
+                            <h3><%= item.title %></h3>
+                        </a>
+                        <div class="card-actions">
+                <form action="/items/<%= item.id %>/edit">
+                            <button type="submit" class="btn-card btn-edit">Edit</button>
+                </form>
+                            <form action="/items/<%= item.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus item ini?');">
+                                <button type="submit" class="btn-card btn-delete">Hapus</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>Lemari Anda masih kosong. Yuk, tambahkan item pertamamu!</p>
+            <% } %>
+        </div>
+    </div>
+
+</div>
+
+<%- include('partials/footer') %>

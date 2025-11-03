@@ -1,0 +1,925 @@
+/* =================================
+   1. GLOBAL, FONT & STICKY FOOTER SETUP
+   ================================= */
+
+/* Import Font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Oswald:wght@700&display=swap'); /* Added Oswald for logo */
+
+/* Color Variables for consistency */
+:root {
+    --bg-dark: #0f0f12;
+    --bg-light: #1c1c21;
+    --border-color: #313139;
+    --text-primary: #e4e4e7;
+    --text-secondary: #a0a0ab;
+    --accent-color: #7b40f5; /* Purple accent */
+    --glass-bg: rgba(255, 255, 255, 0.1); /* Slightly more subtle glass */
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    --placeholder-bg: rgba(255, 255, 255, 0.05); /* Placeholder background */
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    color: var(--text-primary);
+    background-color: var(--bg-dark); /* Default dark background */
+    /* Animated gradient for base, overridden by page-specific styles if needed */
+    background: linear-gradient(135deg, #0d0c1d, #1c1a3e, #0d0c1d);
+    background-size: 200% 200%;
+    animation: gradientAnimation 15s ease infinite;
+    background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* Background Animation */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    flex: 1; /* For Sticky Footer */
+}
+
+a {
+    text-decoration: none;
+    color: var(--accent-color);
+    transition: all 0.2s ease-in-out;
+}
+
+a:hover {
+    filter: brightness(1.2);
+    text-shadow: 0 0 8px var(--accent-color);
+}
+
+/* =================================
+   2. HEADER & NAVIGATION (UMUM)
+   ================================= */
+.main-header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 0.5rem 0;
+    transition: top 0.3s ease-in-out;
+}
+
+.navbar--hidden {
+    top: -100px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.8rem 2rem;
+    background: rgba(255, 255, 255, 0.15); /* Slightly less transparent */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 50px;
+    border: 1px solid var(--glass-border);
+}
+
+.nav-logo {
+    font-family: 'Oswald', sans-serif; /* Consistent logo font */
+    font-weight: 700;
+    font-size: 1.8rem; /* Slightly larger logo */
+    color: #ffffff;
+    text-decoration: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2.5rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #f0f0f0;
+    font-weight: 500;
+    padding: 5px 0;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #ffffff;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #ffffff;
+    bottom: 0;
+    left: 0;
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.3s ease-out;
+}
+
+.nav-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+/* =================================
+   3. GENERAL COMPONENTS (BUTTONS, CARDS, GRIDS)
+   ================================= */
+
+/* --- Buttons --- */
+.btn {
+    display: inline-block; /* Ensure buttons behave correctly */
+    text-decoration: none;
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn-primary {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+.btn-primary:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-secondary { background-color: rgba(85, 85, 85, 0.8); color: #fff; border: 1px solid rgba(85, 85, 85, 1);}
+.btn-danger { background-color: rgba(192, 57, 43, 0.8); color: #fff; border: 1px solid rgba(192, 57, 43, 1);}
+.btn-secondary:hover { background-color: rgba(85, 85, 85, 1); }
+.btn-danger:hover { background-color: rgba(192, 57, 43, 1); }
+
+/* --- Item Grid --- */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem; /* Consistent gap */
+}
+
+/* --- Item Card (Glassmorphism Style) --- */
+.item-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    overflow: hidden; /* Important for image radius */
+    text-align: left; /* Changed from center */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex; /* Use flex for better internal alignment */
+    flex-direction: column;
+}
+
+.item-card:hover {
+    transform: translateY(-8px); /* Subtle lift */
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Link inside card */
+.item-card a:not(.btn-card) { /* Exclude edit/delete buttons */
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    flex-grow: 1; /* Make link fill space */
+}
+
+/* Item Image */
+.item-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Item card text content */
+.item-card h3 {
+    margin: 1rem 1.5rem 0.5rem;
+    color: #fff;
+    font-size: 1.25rem;
+}
+
+.item-card p {
+    color: #ccc;
+    font-size: 0.9em;
+    margin: 0 1.5rem 1rem;
+}
+
+/* --- Card Actions (Edit/Delete buttons) - PERBAIKAN DI SINI --- */
+.card-actions {
+    padding: 0 1.5rem 1.5rem;
+    display: flex; /* **GUNAKAN FLEXBOX** */
+    gap: 0.75rem;   /* Jarak antar tombol */
+}
+
+/* Targetkan link (Edit) dan form (Hapus) di dalam card-actions */
+.card-actions a.btn-card,
+.card-actions form {
+    flex: 1; /* **BUAT KEDUANYA MENGISI RUANG SAMA RATA** */
+    display: block; /* Pastikan form juga block */
+}
+
+/* Style umum untuk tombol di dalam card */
+.btn-card {
+    display: block;     /* Pastikan tombol mengisi lebar parent (form atau a) */
+    width: 100%;        /* **BUAT LEBAR TOMBOL 100%** */
+    text-decoration: none;
+    padding: 8px 10px;  /* Sesuaikan padding jika perlu agar teks pas */
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center; /* Teks tombol di tengah */
+    box-sizing: border-box; /* Agar padding tidak menambah ukuran */
+}
+
+.btn-edit {
+    background-color: rgba(52, 152, 219, 0.8);
+    color: #fff;
+}
+.btn-edit:hover {
+    background-color: rgba(52, 152, 219, 1);
+}
+
+.btn-delete { /* Ini menata <button> di dalam form */
+    background-color: rgba(231, 76, 60, 0.8);
+    color: #fff;
+    /* Ukuran dan style lain (width, padding, dll) diwarisi dari .btn-card */
+}
+.btn-delete:hover {
+    background-color: rgba(231, 76, 60, 1);
+}
+/* --- AKHIR PERBAIKAN TOMBOL --- */
+
+
+/* =================================
+   4. HOMEPAGE SPECIFIC STYLES (INDEX.EJS)
+   ================================= */
+
+/* --- Hero Section --- */
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 31vh; /* Anda mengubah ini sebelumnya */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+    overflow: hidden;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/uploads/hero-bg-placeholder.jpg'); /* <-- REPLACE IMAGE PATH */
+    background-size: cover;
+    background-position: center 30%;
+    filter: brightness(0.7);
+    z-index: 0;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 800px;
+    padding: 20px;
+}
+
+.hero-logo {
+    font-family: 'Oswald', sans-serif;
+    font-size: 5rem;
+    font-weight: bold;
+    letter-spacing: 5px;
+    margin: 1rem 0;
+    color: #fff;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #ccc;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-content .btn-primary {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    border-radius: 30px;
+}
+
+/* --- Features Section --- */
+.features-section {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+    background-color: var(--bg-light);
+    flex-wrap: wrap;
+}
+
+.feature-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 0 0 200px;
+    max-width: 200px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid var(--glass-border);
+    padding: 1.5rem 1rem;
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.3s ease;
+    text-decoration: none;
+    color: var(--text-light);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.feature-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.feature-card h3 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: #fff;
+}
+.feature-card p {
+    font-size: 0.9em;
+    color: #ccc;
+    margin-top: 0.5rem;
+}
+
+/* --- Featured Items Section --- */
+.featured-items {
+    padding: 4rem 2rem;
+    text-align: center;
+    background-color: #25253f; /* Anda mengubah ini sebelumnya */
+    border-radius: 35px;
+}
+
+.featured-items h2 {
+    font-size: 2.5rem;
+    font-weight: 1000;
+    margin-bottom: 5rem; /* Anda mengubah ini sebelumnya */
+    color: #fff;
+}
+
+.featured-items .subtitle {
+    font-size: 1.1rem;
+    color: var(--accent-color);
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.featured-items .items-grid {
+     max-width: 1200px;
+     margin: 0 auto;
+}
+
+/* =================================
+   5. PROFILE PAGE SPECIFIC STYLES (PROFILE.EJS)
+   ================================= */
+
+/* Profile Page Background */
+body.page-profile {
+    background: linear-gradient(110deg, #1e3c72 0%, #2a5298 100%);
+    background-attachment: fixed;
+}
+
+/* Profile Layout */
+.page-profile .profile-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2.5rem;
+}
+
+/* Profile Sidebar */
+.page-profile .profile-sidebar {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    margin-left: -75px;
+}
+
+.page-profile .profile-sidebar .user-info {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.page-profile .profile-sidebar .user-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 0 auto 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.page-profile .profile-sidebar .user-name {
+    font-size: 1.5rem;
+    color: #fff;
+    margin: 0 0 0.25rem 0;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.page-profile .profile-sidebar .user-email {
+    font-size: 0.9rem;
+    color: #eee;
+    opacity: 0.8;
+}
+
+.page-profile .profile-sidebar .profile-nav .nav-button {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+    color: #f0f0f0;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.page-profile .profile-sidebar .profile-nav .nav-button:hover,
+.page-profile .profile-sidebar .profile-nav .nav-button.active {
+    color: #fff; /* Anda mengubah warna hover sebelumnya */
+}
+
+/* Profile Main Content */
+.page-profile .profile-main {
+    flex: 1;
+}
+
+.page-profile .profile-main .main-header-block {
+    padding-bottom: 2rem;
+}
+
+.page-profile .profile-main .main-header-block h1 {
+    color: #fff;
+    font-size: 2.8rem;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.page-profile .profile-main .main-header-block p {
+    color: #eee;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+/* Specific hover for cards on profile */
+.page-profile .item-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 40px 0 rgba(137, 196, 255, 0.3); /* Blue glow */
+}
+
+/* Profile Card Actions - Now handled by General Components */
+
+/* =================================
+   6. ITEM DETAIL PAGE SPECIFIC STYLES (ITEMDETAIL.EJS)
+   ================================= */
+.item-detail-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: 2rem;
+    background: var(--glass-bg);
+    border-radius: 15px;
+    margin-top: 2rem;
+    color: #eee;
+}
+
+.item-detail-image {
+    flex: 1 1 40%;
+    max-width: 450px;
+    min-width: 250px;
+}
+
+.item-detail-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    display: block;
+}
+
+.item-detail-info {
+    flex: 2 1 55%;
+    min-width: 300px;
+}
+.item-detail-info h1 { color: #fff; margin-top: 0; }
+.item-owner a { color: #bbb; }
+.item-meta {
+    font-size: 0.9em;
+    color: #ccc;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+}
+.item-meta span { white-space: nowrap; }
+
+.item-description {
+    margin-bottom: 2rem;
+    line-height: 1.7;
+}
+.item-description h3 { margin-top: 0; }
+.item-actions .btn, .item-actions button {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+.item-actions form { display: inline-block; }
+
+
+/* Favorite Button Section */
+.favorite-section {
+   display: flex;
+   align-items: center;
+   gap: 0.5rem;
+   flex-shrink: 0;
+   margin-left: auto;
+   padding-left: 1rem;
+}
+
+.btn-favorite {
+    background: none;
+    border: none;
+    font-size: 2.2rem;
+    cursor: pointer;
+    padding: 0 5px;
+    color: #ccc;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+.btn-favorite:hover {
+    color: #f1c40f;
+    transform: scale(1.2);
+}
+.btn-favorite.favorited { color: #f1c40f; }
+.favorite-count { color: var(--text-secondary, #ccc); font-size: 0.9em; white-space: nowrap; }
+
+/* =================================
+   7. FORM STYLES (LOGIN, REGISTER, EDIT ITEM)
+   ================================= */
+
+/* General form container style */
+.form-container {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    text-align: left;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    color: #eee;
+}
+
+.form-container h2,
+.form-container p:first-of-type {
+    text-align: center;
+}
+.form-container h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.form-container p:first-of-type {
+    margin-bottom: 2rem;
+    color: #ccc;
+}
+
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #f0f0f0;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="number"],
+.form-group input[type="file"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: inherit;
+}
+
+.form-group input[type="file"] {
+    background: none;
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    padding: 10px 15px;
+}
+.form-group input[type="file"]:focus {
+     box-shadow: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23cccccc' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+    padding-right: 40px;
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.form-group select option {
+     background-color: var(--bg-light, #1c1c21);
+     color: #ffffff;
+}
+
+.form-group input:not([type="file"]):focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.radio-group label {
+    display: inline-block;
+    margin-right: 1.5rem;
+    cursor: pointer;
+    color: #eee;
+}
+.radio-group input[type="radio"] {
+    margin-right: 0.5rem;
+    accent-color: var(--accent-color);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: #aaa;
+}
+.form-group p {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.form-group img {
+    max-width: 150px;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.form-container .btn-primary {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 14px;
+    font-size: 1.1rem;
+}
+
+.form-footer {
+    margin-top: 2rem;
+    text-align: center;
+    color: #eee;
+}
+.form-footer a {
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+}
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+
+/* =================================
+   8. FOOTER (UMUM)
+   ================================= */
+.main-footer {
+    color: #aaa;
+    padding: 4rem 2rem 2rem;
+    font-size: 0.9rem;
+    margin-top: auto; /* Sticky Footer */
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-column .footer-logo {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.footer-column h4 {
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column ul li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-column ul li a,
+.footer-column p {
+    color: #aaa;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    line-height: 1.5;
+}
+.footer-column ul li a:hover {
+    color: #fff;
+}
+.footer-column p {
+    margin: 0 0 0.5rem 0;
+}
+
+/* =================================
+   9. RESPONSIVE ADJUSTMENTS (UMUM)
+   ================================= */
+@media (max-width: 768px) {
+    /* Header */
+    .navbar {
+        padding: 0.8rem 1rem;
+    }
+    .nav-menu {
+        /* You might need a mobile menu (hamburger icon) implementation here */
+        gap: 1rem; /* Smaller gap for now */
+        flex-wrap: wrap; /* Allow wrapping if needed */
+    }
+    .nav-link {
+        font-size: 0.85rem;
+    }
+
+    /* Hero */
+    .hero-content h1, .hero-logo {
+        font-size: clamp(2.5rem, 8vw, 3.5rem);
+    }
+    .hero-content p {
+        font-size: 1rem;
+    }
+
+    /* Features */
+    .features-section {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .feature-card {
+        flex: 0 0 90%;
+        max-width: 300px;
+    }
+
+    /* Grid Items */
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Smaller cards on mobile */
+        gap: 1rem;
+    }
+    .item-image {
+        height: 200px; /* Shorter image */
+    }
+    .item-card h3 { font-size: 1.1rem; }
+    .item-card p { font-size: 0.85rem; }
+
+
+    /* Profile */
+    .page-profile .profile-container {
+        flex-direction: column;
+    }
+    .page-profile .profile-sidebar {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: none;
+        margin-bottom: 2rem;
+    }
+
+    /* Detail Item */
+    .item-detail-container {
+        padding: 1rem;
+    }
+    .item-detail-image {
+        max-width: none;
+    }
+
+    /* Forms */
+    .form-container {
+        margin: 2rem auto;
+        padding: 1.5rem;
+    }
+
+    /* Footer */
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .footer-column .footer-logo {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

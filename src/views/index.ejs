@@ -1,0 +1,27 @@
+<%- include('partials/header', { title: title }) %>
+
+<div class="hero-section">
+    <h1>Temukan Gaya. Bagikan Inspirasi.</h1>
+    <p>Platform untuk memamerkan OOTD, menukar, atau menjual koleksi preloved-mu.</p>
+    <a href="/items" class="btn btn-primary">Mulai Explore</a> </div>
+
+<div class="featured-items">
+    <h2>Koleksi Terbaru</h2>
+    <div class="items-grid">
+        <% if(items && items.length > 0) { %>
+            <% items.forEach(item => { %>
+                <div class="item-card">
+                    <a href="/items/<%= item.id %>" style="text-decoration: none; color: inherit;">
+                        <img src="/<%= item.image_url %>" alt="<%= item.title %>" class="item-image">
+                        <h3><%= item.title %></h3>
+                    </a>
+                    <p>Oleh: <%= item.owner_username %></p>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p style="text-align: center; width: 100%; grid-column: 1 / -1;">Belum ada item untuk ditampilkan.</p>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
