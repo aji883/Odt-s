@@ -1,5 +1,7 @@
 <%- include('partials/header', { title: title, bodyClass: typeof bodyClass != 'undefined' ? bodyClass : '' }) %>
 
+<a href="javascript:history.back()" class="btn-back">←</a>
+
 <div class="item-detail-container">
     <div class="item-detail-image">
         <img src="/<%= item.image_url %>" alt="<%= item.title %>">
@@ -19,7 +21,8 @@
                 </span>
             </div>
             </div>
-        <p class="item-owner">Oleh: <a href="#"><%= item.owner_username %></a></p> <div class="item-meta">
+        <p class="item-owner">Oleh: <a href="#"><%= item.owner_username %></a></p>
+        <div class="item-meta">
             <span><strong>Kategori:</strong> <%= item.category %></span> |
             <span><strong>Ukuran:</strong> <%= item.size %></span> |
             <span><strong>Status:</strong> <%= item.status %></span>
@@ -35,16 +38,14 @@
 
         <div class="item-actions">
              <% if (isOwner) { %>
-                <form action="/items/<%= item.id %>/edit">
-                    <button class="btn btn-primary">Edit</button>
-                </form>
-
+                <a href="/items/<%= item.id %>/edit" class="btn btn-secondary">Edit Item</a>
                 <form action="/items/<%= item.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus item ini?');">
                     <button type="submit" class="btn btn-danger">Hapus Item</button>
                 </form>
             <% } else { %>
-                <% if (item.status === 'Dijual' || item.status === 'Bisa di-Swap') { %>
-                    <a href="/items/<%= item.id %>/offer" class="btn btn-primary">Ajukan Tawaran</a> <% } else { %>
+                 <% if (item.status === 'Dijual' || item.status === 'Bisa di-Swap') { %>
+                    <a href="/items/<%= item.id %>/offer" class="btn btn-primary">Ajukan Tawaran</a>
+                 <% } else { %>
                     <p><em>Item ini hanya untuk dipamerkan.</em></p>
                  <% } %>
             <% } %>

@@ -923,3 +923,157 @@ body.page-profile {
         margin-right: auto;
     }
 }
+
+/* =================================
+   TOMBOL KEMBALI (BTN-BACK)
+   ================================= */
+.btn-back {
+    display: inline-block;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem; /* Sedikit jarak dari konten di bawahnya */
+    padding: 8px 16px;
+    background-color: rgba(255, 255, 255, 0.15); /* Sesuaikan dengan tema Anda */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #eee;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-back:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    text-shadow: none; /* Menghapus efek glow dari link global */
+    filter: brightness(1);
+}
+
+/* =================================
+   10. STYLE HALAMAN EXPLORE (BARU)
+   ================================= */
+
+/* Tema background khusus untuk halaman Explore */
+body.page-explore {
+    background: linear-gradient(110deg, #200e2f 0%, #1e53b1 100%);
+    background-attachment: fixed;
+}
+
+.explore-container {
+    max-width: 1200px;
+}
+
+.explore-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: var(--glass-bg);
+    border-radius: 15px;
+    border: 1px solid var(--glass-border);
+}
+.explore-header h1 {
+    color: #fff;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+.explore-header p {
+    color: #ccc;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Search Bar */
+.search-bar-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+.search-form {
+    display: flex;
+    width: 100%;
+}
+.search-form input[type="text"] {
+    flex-grow: 1;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px 15px;
+    font-size: 1rem;
+    color: #fff;
+    border-radius: 10px 0 0 10px;
+    outline: none;
+}
+.btn-search {
+    padding: 12px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #1211a7;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.btn-search:hover {
+    background-color: #6082f0;
+}
+
+/* Konten Explore */
+.explore-content h2 {
+    color: #fff;
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Grid Hasil Pencarian User */
+.user-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+.user-card {
+    background: var(--glass-bg);
+    border-radius: 15px;
+    border: 1px solid var(--glass-border);
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    transition: transform 0.2s ease;
+}
+.user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.user-avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 0 auto 1rem;
+}
+.user-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* Grid Item di Halaman Explore (lebih simpel) */
+.explore-grid .item-card {
+    padding: 0; /* Hapus padding default .item-card */
+    text-align: left;
+}
+.explore-grid .item-card h3 { /* Hapus h3 jika tidak dipakai */
+   display: none;
+}
+.explore-grid .item-card .item-image {
+    border-radius: 15px 15px 0 0; /* Hanya sudut atas */
+    margin-bottom: 0;
+}
+.explore-card-info {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.item-owner-username {
+    font-size: 0.9rem;
+    color: #ccc;
+    font-weight: 500;
+}

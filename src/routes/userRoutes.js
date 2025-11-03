@@ -1,30 +1,61 @@
 const express = require('express');
 const router = express.Router();
 const { isLoggedIn } = require('../middleware/authMiddleware');
-const Item = require('../models/Item'); // Impor model langsung di sini
+const Item = require('../models/Item');
+const User = require('../models/User');
 
 /**
- * @desc    Menampilkan halaman profil pengguna (Lemari Virtual)
+ * @desc    [PRIBADI] Menampilkan halaman profil PENGGUNA YANG LOGIN
  * @route   GET /user/profile
+ * @note    Rute ini HARUS di atas '/user/:id'
  */
 router.get('/profile', isLoggedIn, async (req, res) => {
     try {
         const { userId, username, email } = req.session;
-
-        // MENGAMBIL DATA ASLI DARI DATABASE
-        // Menggunakan fungsi findByUserId yang ada di Item model
         const userItems = await Item.findByUserId(userId);
 
-        // Me-render file 'profile.ejs' dan mengirimkan data asli dari database
-        res.render('profile', {
+        res.render('profile', { // Render profile.ejs
             title: 'LemaRI-ku',
             username: username,
             email: email,
-            items: userItems, // Variabel 'items' sekarang berisi data asli
+            items: userItems,
             bodyClass: 'page-profile'
         });
     } catch (error) {
         console.error("Error saat mengambil item profil:", error);
+        res.status(500).send('Terjadi error di server');
+    }
+});
+
+/**
+ * @desc    [PUBLIK] Menampilkan halaman profil PENGGUNA LAIN
+ * @route   GET /user/:id
+ */
+router.get('/:id', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        
+        // Cek jika user mencoba melihat profilnya sendiri via link publik
+        if (req.session.userId == userId) {
+            return res.redirect('/user/profile');
+        }
+
+        const profileUser = await User.findById(userId);
+
+        if (!profileUser) {
+            return res.status(404).send('Pengguna tidak ditemukan.');
+        }
+
+        const userItems = await Item.findByUserId(userId);
+
+        res.render('publicProfile', { // Render view BARU: publicProfile.ejs
+            title: profileUser.username,
+            profileUser: profileUser,
+            items: userItems,
+            bodyClass: 'page-profile' // Menggunakan style CSS yang sama
+        });
+    } catch (error) {
+        console.error("Error saat mengambil profil publik:", error);
         res.status(500).send('Terjadi error di server');
     }
 });

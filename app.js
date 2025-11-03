@@ -6,6 +6,7 @@ const session = require('express-session');
 const itemRoutes = require('./src/routes/itemRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const adminRoutes = require('./src/routes/adminRoutes'); // <-- TAMBAHKAN INI
 
 // Inisialisasi aplikasi Express
 const app = express();
@@ -38,6 +39,8 @@ app.use('/', itemRoutes);
 app.use('/auth', authRoutes);
 // Semua URL yang diawali '/user' akan ditangani oleh userRoutes
 app.use('/user', userRoutes);
+// Semua URL yang diawali '/admin' akan ditangani oleh adminRoutes
+app.use('/admin', adminRoutes); // <-- TAMBAHKAN INI
 
 // Menjalankan server pada port yang ditentukan
 app.listen(PORT, () => {

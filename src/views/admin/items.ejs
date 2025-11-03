@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #222; color: #eee; }
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a { color: #bbb; text-decoration: none; margin-right: 15px; }
+        .nav-links a.logout { color: #f39c12; font-weight: bold; }
+        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .item-card { border: 1px solid #555; border-radius: 8px; overflow: hidden; background: #333; }
+        .item-card img { width: 100%; height: 250px; object-fit: cover; }
+        .item-info { padding: 15px; }
+        .item-info h3 { margin: 0 0 10px 0; }
+        .item-info p { margin: 0; font-size: 0.9em; color: #ccc; }
+        .item-actions { padding: 10px 15px; border-top: 1px solid #555; }
+        .btn { border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; color: white; text-decoration: none; display: inline-block; }
+        .btn-delete { background-color: #e74c3c; } .btn-delete:hover { background-color: #c0392b; }
+        .btn-ban { background-color: #f39c12; } .btn-ban:hover { background-color: #e67e22; }
+        .user-banned p { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Moderasi Konten Item</h1>
+    
+    <p class="nav-links">
+        <a href="/admin/dashboard">Dashboard</a> | 
+        <a href="/admin/users">Manajemen Pengguna</a> |
+        <a href="/auth/logout" class="logout">Logout</a>
+    </p>
+
+    <div class="items-grid">
+        <% if(items && items.length > 0) { %>
+            <% items.forEach(item => { %>
+                <div class="item-card">
+                    <img src="/<%= item.image_url %>" alt="<%= item.title %>">
+                    <div class="item-info">
+                        <h3><%= item.title %></h3>
+                        <p>Oleh: <%= item.owner_username %> (ID: <%= item.user_id %>)</p>
+                        <% if(item.owner_status === 'banned') { %>
+                            <p class="user-banned">USER DIBLOKIR</p>
+                        <% } %>
+                    </div>
+                    <div class="item-actions">
+                        <form action="/admin/items/<%= item.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MENGHAPUS item ini?');">
+                            <button type="submit" class="btn btn-delete">Hapus Item</button>
+                        </form>
+                        
+                        <% if(item.owner_status === 'active') { %>
+                            <form action="/admin/users/<%= item.user_id %>/ban" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MEMBLOKIR user <%= item.owner_username %>?');">
+                                <button type="submit" class="btn btn-ban">Blokir User</button>
+                            </form>
+                        <% } %>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p>Tidak ada item untuk ditampilkan.</p>
+        <% } %>
+    </div>
+</body>
+</html>

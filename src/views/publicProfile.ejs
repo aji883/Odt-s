@@ -1,0 +1,38 @@
+<%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
+
+<div class="profile-container">
+
+    <aside class="profile-sidebar">
+        <div class="user-info">
+            <div class="user-avatar"></div>
+            <h2 class="user-name"><%= profileUser.username %></h2>
+            <p class="user-email">
+                Bergabung sejak: <%= new Date(profileUser.created_at).toLocaleDateString('id-ID') %>
+            </p>
+            </div>
+    </aside>
+
+    <div class="profile-main">
+        <div class="main-header-block">
+            <h1>Koleksi <%= profileUser.username %></h1>
+            <p>Lihat semua item yang di-upload oleh <%= profileUser.username %>.</p>
+        </div>
+
+        <div class="items-grid">
+            <% if(items && items.length > 0) { %>
+                <% items.forEach(item => { %>
+                    <div class="item-card">
+                         <a href="/items/<%= item.id %>" style="text-decoration: none; color: inherit;">
+                            <img src="/<%= item.image_url %>" alt="<%= item.title %>" class="item-image">
+                            <h3><%= item.title %></h3>
+                        </a>
+                        </div>
+                <% }) %>
+            <% } else { %>
+                <p><%= profileUser.username %> belum mengupload item apapun.</p>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

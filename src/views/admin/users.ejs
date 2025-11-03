@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #222; color: #eee; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #555; padding: 10px; text-align: left; }
+        th { background-color: #333; }
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a { color: #bbb; text-decoration: none; margin-right: 15px; }
+        .nav-links a.logout { color: #f39c12; font-weight: bold; }
+        .btn { border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; color: white; text-decoration: none; display: inline-block; }
+        .btn-delete { background-color: #e74c3c; } .btn-delete:hover { background-color: #c0392b; }
+        .btn-ban { background-color: #f39c12; } .btn-ban:hover { background-color: #e67e22; }
+        .btn-unban { background-color: #2ecc71; } .btn-unban:hover { background-color: #27ae60; }
+        .status-banned { color: #e74c3c; font-weight: bold; }
+        .status-active { color: #2ecc71; }
+    </style>
+</head>
+<body>
+    <h1>Manajemen Pengguna</h1>
+    
+    <p class="nav-links">
+        <a href="/admin/dashboard">Dashboard</a> | 
+        <a href="/admin/items">Moderasi Item</a> |
+        <a href="/auth/logout" class="logout">Logout</a>
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Tindakan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(users && users.length > 0) { %>
+                <% users.forEach(user => { %>
+                    <tr>
+                        <td><%= user.id %></td>
+                        <td><%= user.username %></td>
+                        <td><%= user.email %></td>
+                        <td><%= user.role %></td>
+                        <td>
+                            <span class="status-<%= user.status %>"><%= user.status %></span>
+                        </td>
+                        <td>
+                            <form action="/admin/users/<%= user.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MENGHAPUS pengguna ini? Ini tidak bisa dikembalikan.');">
+                                <button type="submit" class="btn btn-delete">Hapus</button>
+                            </form>
+                            
+                            <% if(user.status === 'active') { %>
+                                <form action="/admin/users/<%= user.id %>/ban" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MEMBLOKIR pengguna ini?');">
+                                    <button type="submit" class="btn btn-ban">Blokir</button>
+                                </form>
+                            <% } else { %>
+                                <form action="/admin/users/<%= user.id %>/unban" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MEMBUKA BLOKIR pengguna ini?');">
+                                    <button type="submit" class="btn btn-unban">Buka Blokir</button>
+                                </form>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="6">Tidak ada pengguna ditemukan.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</body>
+</html>

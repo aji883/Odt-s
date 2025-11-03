@@ -1,0 +1,53 @@
+<%- include('partials/header', { title: title, bodyClass: 'page-explore' }) %>
+
+<div class="explore-container">
+    <div class="explore-header">
+        <h1>Explore</h1>
+        <p>Temukan item baru atau cari pengguna lain.</p>
+
+        <div class="search-bar-container">
+            <form action="/items" method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Cari username..." value="<%= typeof searchQuery != 'undefined' ? searchQuery : '' %>">
+                <button type="submit" class="btn-search">Cari</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="explore-content">
+        <% if (userResults && userResults.length > 0) { %>
+            <h2>Hasil Pencarian Pengguna</h2>
+            <div class="user-results-grid">
+                <% userResults.forEach(user => { %>
+                    <a href="/user/<%= user.id %>" class="user-card"> 
+                        <div class="user-avatar-placeholder"></div>
+                        <h3><%= user.username %></h3>
+                    </a>
+                <% }) %>
+            </div>
+
+        <% } else if (searchQuery) { %>
+             <p style="text-align: center;">Pengguna "<%= searchQuery %>" tidak ditemukan.</p>
+
+        <% } else { %>
+            <h2>Postingan Acak</h2>
+            <% if (items && items.length > 0) { %>
+                <div class="items-grid explore-grid">
+                    <% items.forEach(item => { %>
+                        <div class="item-card explore-item-card">
+                            <a href="/items/<%= item.id %>" style="text-decoration: none; color: inherit;">
+                                <img src="/<%= item.image_url %>" alt="<%= item.title %>" class="item-image">
+                            </a>
+                            <div class="explore-card-info">
+                                <span class="item-owner-username">Oleh: <%= item.owner_username %></span>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p style="text-align: center;">Belum ada item untuk dijelajahi.</p>
+            <% } %>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
