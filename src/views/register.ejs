@@ -4,14 +4,24 @@
     <h2>Buat Akun Baru</h2>
     <p>Bergabunglah dengan komunitas Odt's untuk mulai berbagi gayamu.</p>
 
-    <form action="/auth/register" method="POST">
+    <form action="/auth/register" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="" required>
+            <input type="text" id="username" name="username" required>
         </div>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="" required>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone_number">No. Telepon (Opsional)</label>
+            <input type="text" id="phone_number" name="phone_number">
+        </div>
+        
+        <div class="form-group">
+            <label for="profilePicture">Foto Profil (Opsional)</label>
+            <input type="file" id="profilePicture" name="profilePicture">
         </div>
         <div class="form-group">
             <label for="password">Password</label>

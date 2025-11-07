@@ -4,9 +4,16 @@
 
     <aside class="profile-sidebar">
         <div class="user-info">
-            <div class="user-avatar"></div>
+            
+            <img src="/<%= typeof profilePicture != 'undefined' && profilePicture ? profilePicture : 'uploads/default-avatar.png' %>" 
+                 alt="<%= username %>" 
+                 class="user-avatar">
+            
             <h2 class="user-name"><%= username %></h2>
-            <p class="user-email"><%= typeof email != 'undefined' ? email : 'email@pengguna.com' %></p>
+            <p class="user-email"><%= typeof email != 'undefined' ? email : 'email@pengguna.com' %></p> 
+            <p class="user-phone">
+                <%= typeof phoneNumber != 'undefined' && phoneNumber ? phoneNumber : 'No. Telepon belum diatur' %>
+            </p>
         </div>
         <nav class="profile-nav">
             <a href="/items/new" class="nav-button">
@@ -15,10 +22,12 @@
             <a href="/user/profile" class="nav-button active">
                 <span>👕</span> Koleksi Saya
             </a>
-            <a href="#" class="nav-button">
+            
+            <a href="/user/favorites" class="nav-button">
                 <span>⭐</span> Item Favorit
             </a>
-            <a href="#" class="nav-button">
+            
+            <a href="/user/profile/edit" class="nav-button">
                 <span>✏️</span> Edit Profil
             </a>
             <a href="/auth/logout" class="nav-button">
@@ -37,7 +46,7 @@
             <% if(items && items.length > 0) { %>
                 <% items.forEach(item => { %>
                     <div class="item-card">
-                         <a href="/items/<%= item.id %>" style="text-decoration: none; color: inherit;">
+                        <a href="/items/<%= item.id %>" style="text-decoration: none; color: inherit;">
                             <img src="/<%= item.image_url %>" alt="<%= item.title %>" class="item-image">
                             <h3><%= item.title %></h3>
                         </a>

@@ -2,13 +2,12 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 
-// Impor Router dari folder src/routes
+// Impor Router
 const itemRoutes = require('./src/routes/itemRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
-const adminRoutes = require('./src/routes/adminRoutes'); // <-- TAMBAHKAN INI
+const adminRoutes = require('./src/routes/adminRoutes');
 
-// Inisialisasi aplikasi Express
 const app = express();
 const PORT = 3000;
 
@@ -17,30 +16,48 @@ app.use(session({
     secret: 'kunciRahasiaSuperAmanUntukAplikasiOdts',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set ke 'true' jika Anda menggunakan HTTPS
+    cookie: { secure: false } 
 }));
 
-// Pengaturan View Engine menggunakan EJS
+
+// --- MIDDLEWARE BARU: Membuat data user global untuk EJS ---
+// (Letakkan middleware ini SETELAH app.use(session(...)) dan SEBELUM app.use(routes...))
+app.use((req, res, next) => {
+    if (req.session.userId) {
+        // Jika user login, buat variabel 'user' yang bisa diakses di semua EJS
+        res.locals.user = {
+            id: req.session.userId,
+            username: req.session.username,
+            email: req.session.email,
+            role: req.session.role,
+            phoneNumber: req.session.phoneNumber,
+            profilePicture: req.session.profilePicture 
+        };
+    } else {
+        // Jika tidak login, variabel 'user' akan null
+        res.locals.user = null;
+    }
+    next(); // Lanjutkan ke middleware atau rute berikutnya
+});
+// --- AKHIR MIDDLEWARE BARU ---
+
+
+// Pengaturan View Engine & Aset Statis
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
 
-// Mengizinkan akses ke folder 'public' (untuk CSS, JS) dan 'uploads' (untuk gambar)
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Middleware untuk membaca data dari form (JSON dan URL-encoded)
+// Middleware untuk membaca data dari form
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Menggunakan Router
-// Semua URL yang diawali '/' akan ditangani oleh itemRoutes
 app.use('/', itemRoutes);
-// Semua URL yang diawali '/auth' akan ditangani oleh authRoutes
 app.use('/auth', authRoutes);
-// Semua URL yang diawali '/user' akan ditangani oleh userRoutes
 app.use('/user', userRoutes);
-// Semua URL yang diawali '/admin' akan ditangani oleh adminRoutes
-app.use('/admin', adminRoutes); // <-- TAMBAHKAN INI
+app.use('/admin', adminRoutes); 
 
 // Menjalankan server pada port yang ditentukan
 app.listen(PORT, () => {

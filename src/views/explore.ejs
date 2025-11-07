@@ -19,8 +19,10 @@
             <div class="user-results-grid">
                 <% userResults.forEach(user => { %>
                     <a href="/user/<%= user.id %>" class="user-card"> 
-                        <div class="user-avatar-placeholder"></div>
-                        <h3><%= user.username %></h3>
+                        
+                        <img src="/<%= user.profile_picture_url || 'uploads/default-avatar.png' %>" 
+                             alt="<%= user.username %>" 
+                             class="user-avatar-placeholder"> <h3><%= user.username %></h3>
                     </a>
                 <% }) %>
             </div>

@@ -140,6 +140,41 @@ a:hover {
     transform-origin: bottom left;
 }
 
+.nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2.5rem;
+    align-items: center; /* <-- 1. TAMBAHKAN INI */
+}
+
+/* ... (kode .nav-link Anda) ... */
+
+/* --- Style untuk Ikon Profil (BARU) --- */
+
+/* Hapus padding vertikal dari link yang berisi ikon */
+.nav-profile-icon a.nav-link {
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1; /* Pastikan tidak ada line-height tambahan */
+}
+
+/* Style untuk gambar profil di navbar */
+.nav-profile-icon img {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    transition: transform 0.2s ease;
+    display: block; /* <-- 2. TAMBAHKAN INI */
+}
+
+.nav-profile-icon img:hover {
+    transform: scale(1.1);
+}
+
 /* =================================
    3. GENERAL COMPONENTS (BUTTONS, CARDS, GRIDS)
    ================================= */

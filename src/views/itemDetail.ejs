@@ -38,7 +38,10 @@
 
         <div class="item-actions">
              <% if (isOwner) { %>
-                <a href="/items/<%= item.id %>/edit" class="btn btn-secondary">Edit Item</a>
+                <form action="/items/<%= item.id %>/edit">
+                    <button class="btn btn-primary">Edit</button>
+                </form>
+
                 <form action="/items/<%= item.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus item ini?');">
                     <button type="submit" class="btn btn-danger">Hapus Item</button>
                 </form>

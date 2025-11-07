@@ -12,10 +12,19 @@
             <a href="/" class="nav-logo">Odt's</a>
             <ul class="nav-menu">
                 <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="/user/profile" class="nav-link">Profile</a></li>
                 <li class="nav-item"><a href="/items" class="nav-link">Explore</a></li>
-                <li class="nav-item"><a href="/auth/login" class="nav-link">Login</a></li>
-            </ul>
+                
+                <% if (user) { %>
+                    <li class="nav-item nav-profile-icon">
+                        <a href="/user/profile" class="nav-link">
+                            <img src="/<%= user.profilePicture || 'uploads/default-avatar.png' %>" alt="<%= user.username %>">
+                        </a>
+                    </li>
+                <% } else { %>
+                    <li class="nav-item"><a href="/auth/login" class="nav-link">Login</a></li>
+                    <li class="nav-item"><a href="/auth/register" class="nav-link">Register</a></li>
+                <% } %>
+                </ul>
         </nav>
     </header>
     <main class="container">

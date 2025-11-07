@@ -1,0 +1,57 @@
+<%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
+
+<div class="profile-container">
+
+    <aside class="profile-sidebar">
+        <% if (user) { %> 
+            <div class="user-info">
+                <img src="/<%= user.profilePicture || 'uploads/default-avatar.png' %>" alt="<%= user.username %>" class="user-avatar">
+                <h2 class="user-name"><%= user.username %></h2>
+                <p class="user-email"><%= user.email %></p> 
+                <p class="user-phone">
+                    <%= user.phoneNumber || 'No. Telepon belum diatur' %>
+                </p>
+            </div>
+            <nav class="profile-nav">
+                <a href="/items/new" class="nav-button">
+                    <span>➕</span> Tambah Item Baru
+                </a>
+                <a href="/user/profile" class="nav-button">
+                    <span>👕</span> Koleksi Saya
+                </a>
+                <a href="/user/favorites" class="nav-button active"> <span>⭐</span> Item Favorit
+                </a>
+                <a href="/user/profile/edit" class="nav-button">
+                    <span>✏️</span> Edit Profil
+                </a>
+                <a href="/auth/logout" class="nav-button">
+                    <span>🚪</span> Logout
+                </a>
+            </nav>
+        <% } %>
+    </aside>
+
+    <div class="profile-main">
+        <div class="main-header-block">
+            <h1>Item Favorit Saya</h1>
+            <p>Semua item yang Anda sukai ada di sini.</p>
+        </div>
+
+        <div class="items-grid">
+            <% if(items && items.length > 0) { %>
+                <% items.forEach(item => { %>
+                    <div class="item-card">
+                        <a href="/items/<%= item.id %>" style="text-decoration: none; color: inherit;">
+                            <img src="/<%= item.image_url %>" alt="<%= item.title %>" class="item-image">
+                            <h3><%= item.title %></h3>
+                        </a>
+                        </div>
+                <% }) %>
+            <% } else { %>
+                <p style="text-align: center; width: 100%; grid-column: 1 / -1;">Anda belum memfavoritkan item apapun.</p>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,14 +1,13 @@
 const db = require('../../config/db');
 const fs = require('fs');
 const path = require('path');
+const Favorite = require('./Favorite'); // Anda mungkin sudah punya ini
+const User = require('./User'); // <-- PERBAIKAN: TAMBAHKAN IMPOR INI
 
 class Item {
 
     // --- 1. FUNGSI DATABASE MURNI (MODEL) ---
 
-    /**
-     * Menyimpan item baru ke dalam database.
-     */
     static async create(newItem) {
         const { title, description, category, size, status, price, imageUrl, userId } = newItem;
         const sql = `INSERT INTO items (title, description, category, size, status, price, user_id, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -16,18 +15,12 @@ class Item {
         return result;
     }
 
-    /**
-     * Mencari semua item milik satu pengguna berdasarkan ID pengguna.
-     */
     static async findByUserId(userId) {
         const sql = 'SELECT * FROM items WHERE user_id = ? ORDER BY created_at DESC';
         const [rows] = await db.execute(sql, [userId]);
         return rows;
     }
 
-    /**
-     * Mencari satu item berdasarkan ID-nya, termasuk username pemilik dan jumlah favorit.
-     */
     static async findById(id) {
         const sql = `
             SELECT
@@ -44,9 +37,6 @@ class Item {
         return rows[0];
     }
 
-    /**
-     * Mengupdate detail item di database.
-     */
     static async update(id, itemData) {
         const { title, description, category, size, status, price, imageUrl } = itemData;
         let sql;
@@ -64,18 +54,12 @@ class Item {
         return result.affectedRows > 0;
     }
 
-    /**
-     * Menghapus item dari database berdasarkan ID.
-     */
     static async deleteById(id) {
         const sql = 'DELETE FROM items WHERE id = ?';
         const [result] = await db.execute(sql, [id]);
         return result.affectedRows > 0;
     }
     
-    /**
-     * Mengambil sejumlah item terbaru untuk ditampilkan di homepage.
-     */
     static async findAllWithLimit(limit = 6) {
         const sql = `
             SELECT i.*, u.username AS owner_username
@@ -88,9 +72,6 @@ class Item {
         return rows;
     }
 
-    /**
-     * [ADMIN] Mengambil SEMUA item untuk moderasi.
-     */
     static async findAll() {
         const sql = `
             SELECT i.*, u.username AS owner_username, u.status AS owner_status
@@ -102,9 +83,6 @@ class Item {
         return rows;
     }
 
-    /**
-     * Mengambil satu item secara acak dari database (untuk halaman Explore).
-     */
     static async findRandom() {
         const sql = `
             SELECT i.*, u.username AS owner_username
@@ -120,9 +98,6 @@ class Item {
 
     // --- 2. FUNGSI LOGIKA HTTP (CONTROLLER) ---
 
-    /**
-     * Menangani request untuk Homepage (GET /)
-     */
     static async handleGetHomepage(req, res) {
         try {
             const items = await Item.findAllWithLimit(6);
@@ -140,18 +115,12 @@ class Item {
         }
     }
 
-    /**
-     * Menangani request untuk Form Item Baru (GET /items/new)
-     */
     static async handleGetNewItemForm(req, res) {
         res.render('newItem', {
             title: 'Upload Item Baru'
         });
     }
 
-    /**
-     * Menangani request untuk Buat Item Baru (POST /items)
-     */
     static async handleCreateItem(req, res) {
         try {
             const { title, description, category, size, status, price } = req.body;
@@ -173,9 +142,6 @@ class Item {
         }
     }
 
-    /**
-     * Menangani request untuk Detail Item (GET /items/:id)
-     */
     static async handleGetItemDetails(req, res) {
         try {
             const itemId = req.params.id;
@@ -184,10 +150,17 @@ class Item {
                 return res.status(404).send('Item tidak ditemukan.');
             }
             const isOwner = req.session.userId === item.user_id;
+            
+            let isFavorited = false;
+            if (req.session.userId) {
+                isFavorited = await Favorite.check(req.session.userId, itemId);
+            }
+
             res.render('itemDetail', {
                 title: item.title,
                 item: item,
-                isOwner: isOwner
+                isOwner: isOwner,
+                isFavorited: isFavorited
             });
         } catch (error) {
             console.error("Error get item details:", error);
@@ -195,9 +168,6 @@ class Item {
         }
     }
 
-    /**
-     * Menangani request untuk Form Edit Item (GET /items/:id/edit)
-     */
     static async handleGetEditItemForm(req, res) {
         try {
             const itemId = req.params.id;
@@ -215,9 +185,6 @@ class Item {
         }
     }
 
-    /**
-     * Menangani request untuk Update Item (POST /items/:id/edit)
-     */
     static async handleUpdateItem(req, res) {
         try {
             const itemId = req.params.id;
@@ -234,7 +201,7 @@ class Item {
             const updatedData = {
                 title, description, category, size, status,
                 price: status === 'Dijual' ? price : null,
-                imageUrl: newImageUrl // Akan undefined jika req.file tidak ada
+                imageUrl: newImageUrl
             };
             const updated = await Item.update(itemId, updatedData);
             if (updated && newImageUrl && currentImageUrl && fs.existsSync(currentImageUrl)) {
@@ -247,9 +214,6 @@ class Item {
         }
     }
 
-    /**
-     * Menangani request untuk Hapus Item (POST /items/:id/delete)
-     */
     static async handleDeleteItem(req, res) {
         try {
             const itemId = req.params.id;
@@ -269,17 +233,27 @@ class Item {
     }
 
     /**
-     * Menangani request untuk Halaman Explore (GET /explore)
+     * @desc    Menangani request untuk Halaman Explore (GET /items)
      */
     static async handleGetExplorePage(req, res) {
          try {
-            const item = await Item.findRandom();
-            if (!item) {
-                return res.status(404).send('Belum ada item untuk dijelajahi.');
+            const searchQuery = req.query.search;
+            let items = [];
+            let userResults = [];
+
+            if (searchQuery) {
+                // SEKARANG 'User' SUDAH DIKENALI
+                userResults = await User.searchByUsername(searchQuery);
+            } else {
+                items = await Item.findAll();
+                items.sort(() => 0.5 - Math.random());
             }
+
             res.render('explore', {
                 title: 'Explore',
-                item: item
+                items: items,
+                userResults: userResults,
+                searchQuery: searchQuery || ''
             });
         } catch (error) {
             console.error("Error get explore page:", error);

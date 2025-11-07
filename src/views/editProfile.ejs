@@ -1,0 +1,47 @@
+<%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
+
+<div class="form-container">
+    <h2>Edit Profil</h2>
+    <p>Perbarui informasi akun Anda.</p>
+
+    <form action="/user/profile/edit" method="POST" enctype="multipart/form-data">
+        
+        <div class="form-group">
+            <label>Foto Profil Saat Ini:</label>
+            <img src="/<%= user.profile_picture_url || 'uploads/default-avatar.png' %>" 
+                 alt="Avatar" 
+                 style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; display: block;">
+        </div>
+
+        <div class="form-group">
+            <label for="profilePicture">Ganti Foto Profil (Opsional)</label>
+            <input type="file" id="profilePicture" name="profilePicture">
+            <small>Kosongkan jika tidak ingin mengganti foto.</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="<%= user.username %>" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="<%= user.email %>" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone_number">No. Telepon</label>
+            <input type="text" id="phone_number" name="phone_number" value="<%= user.phone_number || '' %>">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password Baru (Opsional)</label>
+            <input type="password" id="password" name="password" placeholder="Kosongkan jika tidak ingin diubah">
+            <small>Isi hanya jika Anda ingin mengganti password.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+    </form>
+</div>
+
+<%- include('partials/footer') %>
