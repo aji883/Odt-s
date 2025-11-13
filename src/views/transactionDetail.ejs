@@ -1,0 +1,87 @@
+<%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
+
+<a href="javascript:history.back()" class="btn-back">← Kembali</a>
+
+<div class="transaction-container">
+    <div class="transaction-header">
+        <h1>Detail Transaksi #<%= transaction.id %></h1>
+        <span class="offer-status status-<%= transaction.status %>"><%= transaction.status %></span>
+    </div>
+
+    <div class="transaction-grid">
+        <div class="transaction-item">
+            <h3>Item yang Ditawar</h3>
+            <div class="item-card">
+                <img src="/<%= transaction.item_image %>" alt="<%= transaction.item_title %>" class="item-image">
+                <h3><a href="/items/<%= transaction.item_main_id %>"><%= transaction.item_title %></a></h3>
+                <p>Oleh: <%= transaction.owner_username %></p>
+            </div>
+        </div>
+
+        <div class="transaction-item">
+            <% if (transaction.type === 'swap') { %>
+                <h3>Item yang Ditawarkan (oleh <%= transaction.proposer_username %>)</h3>
+                
+                <% if (transaction.offered_item_id) { %>
+                    <div class="item-card">
+                        <img src="/<%= transaction.offered_item_image %>" alt="<%= transaction.offered_item_title %>" class="item-image">
+                        <h3><a href="/items/<%= transaction.offered_item_id %>"><%= transaction.offered_item_title %></a></h3>
+                    </div>
+                <% } else if (isProposer) { %>
+                    <p>Anda harus memilih item dari LemaRI-ku untuk ditukarkan:</p>
+                    <form action="/transactions/<%= transaction.id %>/select-swap" method="POST">
+                        <div class="form-group">
+                            <label for="offeredItemId">Pilih Item Anda</label>
+                            <select id="offeredItemId" name="offeredItemId" class="form-control">
+                                <option value="">-- Pilih Item --</option>
+                                <% itemsForSwap.forEach(item => { %>
+                                    <option value="<%= item.id %>"><%= item.title %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Tawarkan Item Ini</button>
+                    </form>
+                <% } else { %>
+                    <div class="item-card" style="height: 300px; display: grid; place-items: center; background: var(--bg-light, #222);">
+                        <p>Menunggu penawar memilih item...</p>
+                    </div>
+                <% } %>
+            
+            <% } else { %>
+                <h3>Ringkasan Pembelian</h3>
+                <div class="transaction-details-box">
+                    <p><strong>Penawar:</strong> <%= transaction.proposer_username %></p>
+                    <p><strong>Jenis:</strong> Pembelian</p>
+                    <p><strong>Status:</strong> <span class="status-<%= transaction.status %>"><%= transaction.status %></span></p>
+                    <hr>
+                    <p class="price"><strong>Harga Item:</strong> Rp <%= (transaction.agreed_price || transaction.item_price).toLocaleString('id-ID') %></p>
+                    <hr>
+                    <p><strong>Alamat Pengiriman:</strong><br><%= transaction.shipping_address %></p>
+                    <p><strong>Metode Pembayaran:</strong> <%= transaction.payment_method %></p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <% if (transaction.message) { %>
+        <div class="transaction-message">
+            <h4>Pesan Awal dari <%= transaction.proposer_username %>:</h4>
+            <p>"<%= transaction.message %>"</p>
+        </div>
+    <% } %>
+
+    <% if (isOwner && transaction.status === 'pending') { %>
+        <div class="transaction-actions">
+            <h3>Konfirmasi Tawaran</h3>
+            <p>Beri tahu <strong><%= transaction.proposer_username %></strong> apakah Anda menerima tawaran ini.</p>
+            <form action="/transactions/<%= transaction.id %>/accept" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-accept">✅ Terima Tawaran</button>
+            </form>
+            <form action="/transactions/<%= transaction.id %>/reject" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-reject">❌ Tolak Tawaran</button>
+            </form>
+        </div>
+    <% } %>
+
+</div>
+<%- include('partials/footer') %>

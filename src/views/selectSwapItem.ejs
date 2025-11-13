@@ -1,0 +1,52 @@
+<%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
+
+<div class="profile-container">
+
+    <div class="profile-main" style="width: 100%;"> <div class="main-header-block">
+            <h1>Pilih Item untuk Ditukar</h1>
+            <p>Anda sedang menawar item: <strong><%= transaction.item_title %></strong>.</p>
+            <p>Silakan pilih salah satu item dari LemaRI-ku Anda yang berstatus "Bisa di-Swap" untuk ditawarkan sebagai barter.</p>
+            <a href="/transactions/<%= transaction.id %>" class="btn-back">← Batal, Kembali ke Detail</a>
+        </div>
+
+        <div class="items-grid">
+            <% if(items && items.length > 0) { %>
+                <% items.forEach(item => { %>
+                    <div class="item-card">
+                        
+                        <img src="/<%= item.image_url %>" alt="<%= item.title %>" class="item-image">
+                        <h3><%= item.title %></h3>
+                        
+                        <div class="card-actions">
+                            <form action="/transactions/<%= transaction.id %>/select-swap" method="POST" style="width: 100%;">
+                                <input type="hidden" name="offeredItemId" value="<%= item.id %>">
+                                <button type="submit" class="btn-card btn-offer">Tawarkan Item Ini</button>
+                            </form>
+                        </div>
+                        
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p style="text-align: center; width: 100%; grid-column: 1 / -1;">
+                    Anda tidak memiliki item yang berstatus "Bisa di-Swap" untuk ditawarkan.
+                    <br>
+                    <a href="/user/profile">Kembali ke Profil</a>
+                </p>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<style>
+    .btn-offer {
+        background-color: #2ecc71; /* Warna hijau 'accept' */
+        color: #fff;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .btn-offer:hover {
+        background-color: #27ae60;
+    }
+</style>

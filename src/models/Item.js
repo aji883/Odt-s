@@ -1,8 +1,8 @@
 const db = require('../../config/db');
 const fs = require('fs');
 const path = require('path');
-const Favorite = require('./Favorite'); // Anda mungkin sudah punya ini
-const User = require('./User'); // <-- PERBAIKAN: TAMBAHKAN IMPOR INI
+const Favorite = require('./Favorite');
+const User = require('./User');
 
 class Item {
 
@@ -17,6 +17,15 @@ class Item {
 
     static async findByUserId(userId) {
         const sql = 'SELECT * FROM items WHERE user_id = ? ORDER BY created_at DESC';
+        const [rows] = await db.execute(sql, [userId]);
+        return rows;
+    }
+
+    /**
+     * [FUNGSI YANG HILANG] Mencari item milik user yang BISA DI-SWAP
+     */
+    static async findSwappableByUserId(userId) {
+        const sql = 'SELECT * FROM items WHERE user_id = ? AND status = "Bisa di-Swap" ORDER BY created_at DESC';
         const [rows] = await db.execute(sql, [userId]);
         return rows;
     }
@@ -41,7 +50,6 @@ class Item {
         const { title, description, category, size, status, price, imageUrl } = itemData;
         let sql;
         let params;
-
         if (imageUrl !== undefined) {
             sql = `UPDATE items SET title = ?, description = ?, category = ?, size = ?, status = ?, price = ?, image_url = ? WHERE id = ?`;
             params = [title, description, category, size, status, price, imageUrl, id];
@@ -49,7 +57,6 @@ class Item {
             sql = `UPDATE items SET title = ?, description = ?, category = ?, size = ?, status = ?, price = ? WHERE id = ?`;
             params = [title, description, category, size, status, price, id];
         }
-
         const [result] = await db.execute(sql, params);
         return result.affectedRows > 0;
     }
@@ -95,9 +102,8 @@ class Item {
         return rows[0];
     }
 
-
     // --- 2. FUNGSI LOGIKA HTTP (CONTROLLER) ---
-
+    
     static async handleGetHomepage(req, res) {
         try {
             const items = await Item.findAllWithLimit(6);
@@ -114,7 +120,7 @@ class Item {
              res.render('index', { title: "Selamat Datang di Odt's", items: dummyItems });
         }
     }
-
+    
     static async handleGetNewItemForm(req, res) {
         res.render('newItem', {
             title: 'Upload Item Baru'
@@ -232,9 +238,6 @@ class Item {
         }
     }
 
-    /**
-     * @desc    Menangani request untuk Halaman Explore (GET /items)
-     */
     static async handleGetExplorePage(req, res) {
          try {
             const searchQuery = req.query.search;
@@ -242,7 +245,6 @@ class Item {
             let userResults = [];
 
             if (searchQuery) {
-                // SEKARANG 'User' SUDAH DIKENALI
                 userResults = await User.searchByUsername(searchQuery);
             } else {
                 items = await Item.findAll();

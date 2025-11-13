@@ -1,0 +1,66 @@
+<%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
+
+<div class="profile-container">
+    <aside class="profile-sidebar">
+        <% if (user) { %> 
+            <div class="user-info">
+                <img src="/<%= user.profilePicture || 'uploads/default-avatar.png' %>" alt="<%= user.username %>" class="user-avatar">
+                <h2 class="user-name"><%= user.username %></h2>
+                <p class="user-email"><%= user.email %></p> 
+                <p class="user-phone"><%= user.phoneNumber || 'No. Telepon belum diatur' %></p>
+            </div>
+            <nav class="profile-nav">
+                <a href="/items/new" class="nav-button"><span>➕</span> Tambah Item Baru</a>
+                <a href="/user/profile" class="nav-button"><span>👕</span> Koleksi Saya</a>
+                <a href="/user/favorites" class="nav-button"><span>⭐</span> Item Favorit</a>
+                <a href="/transactions/received" class="nav-button active"><span>🔔</span> Notifikasi Tawaran</a>
+                <a href="/user/profile/edit" class="nav-button"><span>✏️</span> Edit Profil</a>
+                <a href="/auth/logout" class="nav-button"><span>🚪</span> Logout</a>
+            </nav>
+        <% } %>
+    </aside>
+
+    <div class="profile-main">
+        <div class="main-header-block">
+            <h1>Tawaran yang Anda Kirim</h1>
+            <p>Lacak status tawaran yang Anda kirim ke pengguna lain.</p>
+        </div>
+
+        <div class="offer-section">
+            <div class="offer-list">
+                <% if(offers && offers.length > 0) { %>
+                    <% offers.forEach(offer => { %>
+                        
+                        <div class="offer-card status-<%= offer.status %>">
+                            <a href="/transactions/<%= offer.id %>" class="offer-card-main-link">
+                                <img src="/<%= offer.image_url %>" alt="<%= offer.item_title %>" class="offer-image">
+                                <div class="offer-info">
+                                    <h4><%= offer.item_title %></h4>
+                                    <p>Tawaran <strong><%= offer.type %></strong> kepada <strong><%= offer.owner_username %></strong></p>
+                                </div>
+                            </a>
+                            
+                            <div class="offer-actions">
+                                <span class="offer-status"><%= offer.status %></span>
+                                
+                                <% if (offer.status === 'pending') { %>
+                                    <form action="/transactions/<%= offer.id %>/cancel" method="POST" onsubmit="return confirm('Yakin ingin membatalkan tawaran ini?');">
+                                        <button type="submit" class="btn-cancel">Batalkan</button>
+                                    </form>
+                                <% } else { %>
+                                    <form action="/transactions/<%= offer.id %>/hide-sent" method="POST" onsubmit="return confirm('Yakin ingin menghapus riwayat tawaran ini?');">
+                                        <button type="submit" class="btn-delete-history">Hapus</button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        </div>
+
+                    <% }) %>
+                <% } else { %>
+                    <p>Anda belum mengirim tawaran apapun.</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('partials/footer') %>

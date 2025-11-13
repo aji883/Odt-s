@@ -7,6 +7,7 @@ const itemRoutes = require('./src/routes/itemRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
+const transactionRoutes = require('./src/routes/transactionRoutes');
 
 const app = express();
 const PORT = 3000;
@@ -58,6 +59,7 @@ app.use('/', itemRoutes);
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes); 
+app.use('/transactions', transactionRoutes);
 
 // Menjalankan server pada port yang ditentukan
 app.listen(PORT, () => {

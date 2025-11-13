@@ -3,37 +3,40 @@
 <div class="profile-container">
 
     <aside class="profile-sidebar">
-        <div class="user-info">
-            
-            <img src="/<%= typeof profilePicture != 'undefined' && profilePicture ? profilePicture : 'uploads/default-avatar.png' %>" 
-                 alt="<%= username %>" 
-                 class="user-avatar">
-            
-            <h2 class="user-name"><%= username %></h2>
-            <p class="user-email"><%= typeof email != 'undefined' ? email : 'email@pengguna.com' %></p> 
-            <p class="user-phone">
-                <%= typeof phoneNumber != 'undefined' && phoneNumber ? phoneNumber : 'No. Telepon belum diatur' %>
-            </p>
-        </div>
-        <nav class="profile-nav">
-            <a href="/items/new" class="nav-button">
-                <span>➕</span> Tambah Item Baru
-            </a>
-            <a href="/user/profile" class="nav-button active">
-                <span>👕</span> Koleksi Saya
-            </a>
-            
-            <a href="/user/favorites" class="nav-button">
-                <span>⭐</span> Item Favorit
-            </a>
-            
-            <a href="/user/profile/edit" class="nav-button">
-                <span>✏️</span> Edit Profil
-            </a>
-            <a href="/auth/logout" class="nav-button">
-                <span>🚪</span> Logout
-            </a>
-        </nav>
+        <% if (user) { %> 
+            <div class="user-info">
+                
+                <img src="/<%= typeof profilePicture != 'undefined' && profilePicture ? profilePicture : 'uploads/default-avatar.png' %>" 
+                     alt="<%= username %>" 
+                     class="user-avatar">
+                
+                <h2 class="user-name"><%= username %></h2>
+                <p class="user-email"><%= typeof email != 'undefined' ? email : 'email@pengguna.com' %></p> 
+                <p class="user-phone">
+                    <%= typeof phoneNumber != 'undefined' && phoneNumber ? phoneNumber : 'No. Telepon belum diatur' %>
+                </p>
+            </div>
+            <nav class="profile-nav">
+                <a href="/items/new" class="nav-button">
+                    <span>➕</span> Tambah Item Baru
+                </a>
+                <a href="/user/profile" class="nav-button active">
+                    <span>👕</span> Koleksi Saya
+                </a>
+                <a href="/user/favorites" class="nav-button">
+                    <span>⭐</span> Item Favorit
+                </a>
+                <a href="/transactions/received" class="nav-button">
+                    <span>🔔</span> Notifikasi Tawaran
+                </a>
+                <a href="/user/profile/edit" class="nav-button">
+                    <span>✏️</span> Edit Profil
+                </a>
+                <a href="/auth/logout" class="nav-button">
+                    <span>🚪</span> Logout
+                </a>
+            </nav>
+        <% } %>
     </aside>
 
     <div class="profile-main">
@@ -51,9 +54,9 @@
                             <h3><%= item.title %></h3>
                         </a>
                         <div class="card-actions">
-                <form action="/items/<%= item.id %>/edit">
-                            <button type="submit" class="btn-card btn-edit">Edit</button>
-                </form>
+                            
+                            <a href="/items/<%= item.id %>/edit" class="btn-card btn-edit">Edit</a>
+                            
                             <form action="/items/<%= item.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus item ini?');">
                                 <button type="submit" class="btn-card btn-delete">Hapus</button>
                             </form>

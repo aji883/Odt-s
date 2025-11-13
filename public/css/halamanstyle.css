@@ -1112,3 +1112,96 @@ body.page-explore {
     color: #ccc;
     font-weight: 500;
 }
+
+/* =================================
+   11. STYLE HALAMAN NOTIFIKASI
+   ================================= */
+
+/* Penataan untuk daftar tawaran */
+.offer-section {
+    margin-bottom: 3rem;
+}
+
+/* Judul (jika ada, seperti di halaman hub) */
+.offer-section h2 {
+    color: #fff;
+    border-bottom: 1px solid var(--glass-border, rgba(255,255,255,0.2));
+    padding-bottom: 0.5rem;
+}
+
+.offer-list { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 1rem; 
+}
+
+/* Kartu individu untuk setiap notifikasi */
+.offer-card { 
+    display: flex; 
+    gap: 1rem; 
+    align-items: center; 
+    background: var(--glass-bg, rgba(255,255,255,0.1)); 
+    border: 1px solid var(--glass-border, rgba(255,255,255,0.2)); 
+    padding: 1rem; 
+    border-radius: 10px; 
+    text-decoration: none; 
+    color: #fff;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.offer-card:hover { 
+    transform: scale(1.02); 
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.offer-image { 
+    width: 80px; 
+    height: 80px; 
+    object-fit: cover; 
+    border-radius: 5px; 
+    flex-shrink: 0;
+}
+
+.offer-info h4 { 
+    margin: 0 0 5px 0; 
+    font-size: 1.1em;
+}
+
+.offer-info p { 
+    margin: 0; 
+    color: #ccc; 
+    font-size: 0.9em;
+}
+
+/* Label status (Pending, Accepted, dll.) */
+.offer-status { 
+    margin-left: auto; 
+    padding: 5px 10px; 
+    border-radius: 5px; 
+    font-size: 0.8em; 
+    font-weight: bold; 
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.status-pending { background-color: #f39c12; color: #fff; }
+.status-accepted { background-color: #2ecc71; color: #fff; }
+.status-rejected { background-color: #e74c3c; color: #fff; }
+.status-completed { background-color: #3498db; color: #fff; }
+.status-cancelled { background-color: #95a5a6; color: #fff; }
+
+/* Tombol Hapus Riwayat Baru */
+.btn-delete-history {
+    background-color: #c0392b; /* Warna merah (seperti hapus) */
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8em;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+.btn-delete-history:hover {
+    background-color: #e74c3c;
+}
