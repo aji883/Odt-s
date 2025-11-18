@@ -27,7 +27,7 @@
                     <span>⭐</span> Item Favorit
                 </a>
                 <a href="/transactions/received" class="nav-button">
-                    <span>🔔</span> Notifikasi Tawaran
+                    <span>🔔</span> Notifikasi
                 </a>
                 <a href="/user/profile/edit" class="nav-button">
                     <span>✏️</span> Edit Profil
@@ -55,8 +55,9 @@
                         </a>
                         <div class="card-actions">
                             
-                            <a href="/items/<%= item.id %>/edit" class="btn-card btn-edit">Edit</a>
-                            
+                <form action="/items/<%= item.id %>/edit">
+                            <button type="submit" class="btn-card btn-edit">Edit</button>
+                </form>
                             <form action="/items/<%= item.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus item ini?');">
                                 <button type="submit" class="btn-card btn-delete">Hapus</button>
                             </form>

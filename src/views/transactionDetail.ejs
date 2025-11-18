@@ -1,10 +1,10 @@
 <%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
 
-<a href="javascript:history.back()" class="btn-back">← Kembali</a>
+<a href="javascript:history.back()" class="btn-back">←</a>
 
 <div class="transaction-container">
     <div class="transaction-header">
-        <h1>Detail Transaksi #<%= transaction.id %></h1>
+        <h1>Detail Transaksi</h1>
         <span class="offer-status status-<%= transaction.status %>"><%= transaction.status %></span>
     </div>
 
@@ -62,7 +62,6 @@
             <% } %>
         </div>
     </div>
-    
     <% if (transaction.message) { %>
         <div class="transaction-message">
             <h4>Pesan Awal dari <%= transaction.proposer_username %>:</h4>
@@ -73,15 +72,115 @@
     <% if (isOwner && transaction.status === 'pending') { %>
         <div class="transaction-actions">
             <h3>Konfirmasi Tawaran</h3>
-            <p>Beri tahu <strong><%= transaction.proposer_username %></strong> apakah Anda menerima tawaran ini.</p>
-            <form action="/transactions/<%= transaction.id %>/accept" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-accept">✅ Terima Tawaran</button>
-            </form>
-            <form action="/transactions/<%= transaction.id %>/reject" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-reject">❌ Tolak Tawaran</button>
-            </form>
+            <% if (transaction.type === 'buy' || (transaction.type === 'swap' && transaction.offered_item_id)) { %>
+                <p>Beri tahu <strong><%= transaction.proposer_username %></strong> apakah Anda menerima tawaran ini.</p>
+                <form action="/transactions/<%= transaction.id %>/accept" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-accept">✅ Terima Tawaran</button>
+                </form>
+                <form action="/transactions/<%= transaction.id %>/reject" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-reject">❌ Tolak Tawaran</button>
+                </form>
+            <% } else { %>
+                <p>Menunggu penawar memilih item barter...</p>
+            <% } %>
         </div>
+    <% } %>
+
+    <% if (isProposer) { %>
+        <% if (transaction.status === 'accepted') { %>
+            <div class="transaction-actions received-action">
+                <h3>Konfirmasi Penerimaan</h3>
+                <p>Tawaran Anda telah diterima oleh <strong><%= transaction.owner_username %></strong>. Apakah Anda sudah menerima item ini? Klik untuk menyelesaikan transaksi.</p>
+                <form action="/transactions/<%= transaction.id %>/complete" method="POST">
+                    <button type="submit" class="btn btn-accept">📦 Pesanan Diterima</button>
+                </form>
+            </div>
+        <% } else if (transaction.status === 'completed') { %>
+            <div class="transaction-status-info status-completed">
+                <h3>Transaksi Selesai</h3>
+                <p>Anda telah mengonfirmasi penerimaan item ini.</p>
+            </div>
+        <% } else if (transaction.status === 'rejected') { %>
+            <div class="transaction-status-info status-rejected">
+                <h3>Tawaran Ditolak</h3>
+                <p>Maaf, tawaran Anda ditolak oleh <strong><%= transaction.owner_username %></strong>.</p>
+            </div>
+        <% } else if (transaction.status === 'cancelled') { %>
+             <div class="transaction-status-info status-cancelled">
+                <h3>Tawaran Dibatalkan</h3>
+                <p>Anda telah membatalkan tawaran ini.</p>
+            </div>
+        <% } else if (transaction.status === 'pending' && transaction.type === 'swap' && !transaction.offered_item_id) { %>
+            <div class="transaction-status-info status-pending">
+                <h3>Lanjutkan Tawaran</h3>
+                <p>Anda harus memilih item dari LemaRI-ku Anda untuk ditukarkan.</p>
+            </div>
+        <% } else if (transaction.status === 'pending') { %>
+            <div class="transaction-status-info status-pending">
+                <h3>Menunggu Konfirmasi</h3>
+                <p>Menunggu respon dari <strong><%= transaction.owner_username %></strong>.</p>
+            </div>
+        <% } %>
     <% } %>
 
 </div>
 <%- include('partials/footer') %>
+
+<style>
+    .transaction-header { display: flex; justify-content: space-between; align-items: center; }
+    .transaction-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 2rem; 
+        margin: 2rem 0; 
+    }
+    .transaction-item h3 { color: #fff; }
+    
+    .transaction-details-box {
+        background: var(--glass-bg, rgba(255, 255, 255, 0.1));
+        padding: 1.5rem;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
+    }
+    .transaction-details-box p { font-size: 1.1em; margin: 0.5rem 0; }
+    .transaction-details-box hr { border-color: var(--glass-border, rgba(255, 255, 255, 0.2)); }
+    .transaction-details-box .price { font-size: 1.3em; font-weight: bold; color: #fff; }
+    
+    .transaction-message { background: var(--bg-light, #222); padding: 1rem; border-radius: 5px; margin-top: 1rem; }
+    .transaction-message.info { background: #3a3a5a; }
+    
+    .transaction-actions { background: var(--glass-bg, rgba(255, 255, 255, 0.1)); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--glass-border); margin-top: 2rem; }
+    .transaction-actions h3 { margin-top: 0; }
+
+    /* Kotak Status untuk Penawar */
+    .transaction-status-info {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        border-radius: 10px;
+        border: 1px solid;
+    }
+    .transaction-status-info h3 { margin-top: 0; margin-bottom: 0.5rem; color: #fff; }
+    .transaction-status-info p { margin-bottom: 0; color: #eee; line-height: 1.6; }
+
+    .btn-accept { background-color: #2ecc71; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+    .btn-reject { background-color: #e74c3c; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+
+    .offer-status { padding: 5px 10px; border-radius: 5px; font-size: 0.9em; font-weight: bold; text-transform: uppercase; color: #fff; }
+    .status-pending { background-color: #f39c12; border-color: #f39c12; }
+    .status-accepted { background-color: #2ecc71; border-color: #2ecc71; }
+    .status-rejected { background-color: #e74c3c; border-color: #e74c3c; }
+    .status-cancelled { background-color: #95a5a6; border-color: #95a5a6; }
+    .status-completed { background-color: #3498db; border-color: #3498db; }
+    
+    /* Warna border untuk kotak status */
+    .transaction-status-info.status-accepted { background-color: rgba(46, 204, 113, 0.2); border-color: #2ecc71; }
+    .transaction-status-info.status-rejected { background-color: rgba(231, 76, 60, 0.2); border-color: #e74c3c; }
+    .transaction-status-info.status-pending { background-color: rgba(243, 156, 18, 0.2); border-color: #f39c12; }
+    .transaction-status-info.status-cancelled { background-color: rgba(149, 165, 166, 0.2); border-color: #95a5a6; }
+    .transaction-status-info.status-completed { background-color: rgba(52, 152, 219, 0.2); border-color: #3498db; }
+
+    .transaction-actions.received-action {
+        background: rgba(46, 204, 113, 0.1);
+        border: 1px solid #2ecc71;
+    }
+</style>

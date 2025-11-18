@@ -14,13 +14,12 @@
                 <a href="/items/new" class="nav-button"><span>➕</span> Tambah Item Baru</a>
                 <a href="/user/profile" class="nav-button"><span>👕</span> Koleksi Saya</a>
                 <a href="/user/favorites" class="nav-button"><span>⭐</span> Item Favorit</a>
-                <a href="/transactions/received" class="nav-button active"><span>🔔</span> Notifikasi Tawaran</a>
+                <a href="/transactions/received" class="nav-button active"><span>🔔</span> Notifikasi</a>
                 <a href="/user/profile/edit" class="nav-button"><span>✏️</span> Edit Profil</a>
                 <a href="/auth/logout" class="nav-button"><span>🚪</span> Logout</a>
             </nav>
         <% } %>
     </aside>
-
     <div class="profile-main">
         <div class="main-header-block">
             <h1>Tawaran yang Anda Terima</h1>
@@ -46,8 +45,10 @@
                                 
                                 <% if (offer.status !== 'pending') { %>
                                     <form action="/transactions/<%= offer.id %>/hide-received" method="POST" onsubmit="return confirm('Yakin ingin menghapus riwayat tawaran ini?');">
-                                        <button type="submit" class="btn-delete-history">Hapus</D>
+                                        <button type="submit" class="btn-delete-history">Hapus</button>
                                     </form>
+                                <% } else { %>
+                                    <span class="btn-pending">Perlu Respon</span>
                                 <% } %>
                             </div>
                         </div>
@@ -61,3 +62,15 @@
     </div>
 </div>
 <%- include('partials/footer') %>
+
+<style>
+    .btn-pending {
+        background-color: transparent;
+        color: #f39c12; /* Warna kuning 'pending' */
+        font-size: 0.8em;
+        font-weight: bold;
+        padding: 6px 10px;
+        border-radius: 5px;
+        border: 1px solid #f39c12;
+    }
+</style>

@@ -9,14 +9,14 @@ const path = require('path');
 // --- Logika Controller Dimasukkan Langsung ---
 
 /**
- * @desc    Menampilkan dashboard admin
+ * @desc    Menampilkan dashboard admin (contoh sederhana)
  * @route   GET /admin/dashboard
  */
 const getAdminDashboard = async (req, res) => {
     try {
         // Ambil data untuk statistik
         const users = await User.findAll();
-        const items = await Item.findAll(); // Pastikan Item.findAll() ada di model
+        const items = await Item.findAll();
         
         // Render file dashboard.ejs
         res.render('admin/dashboard', {
@@ -31,19 +31,31 @@ const getAdminDashboard = async (req, res) => {
 };
 
 /**
- * @desc    Menampilkan daftar semua pengguna
+ * @desc    Menampilkan daftar semua pengguna (Dengan Fitur Search)
  * @route   GET /admin/users
  */
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.findAll();
+        const searchQuery = req.query.search;
+        let users;
+
+        if (searchQuery) {
+            // Jika ada query pencarian, gunakan fungsi searchForAdmin
+            // Pastikan Anda sudah menambahkan fungsi searchForAdmin di src/models/User.js
+            users = await User.searchForAdmin(searchQuery);
+        } else {
+            // Jika tidak ada, ambil semua user seperti biasa
+            users = await User.findAll();
+        }
+
         res.render('admin/users', {
             title: 'Manajemen Pengguna',
             users: users,
-            layout: false // Sesuaikan jika Anda pakai layout
+            searchQuery: searchQuery || '', // Kirim text pencarian kembali ke view
+            layout: false
         });
     } catch (error) {
-        console.error("Error mengambil semua user:", error);
+        console.error("Error mengambil data user:", error);
         res.status(500).send('Error Server');
     }
 };
@@ -76,7 +88,7 @@ const getModerationFeed = async (req, res) => {
         res.render('admin/items', {
             title: 'Moderasi Konten Item',
             items: items,
-            layout: false // Sesuaikan jika Anda pakai layout
+            layout: false
         });
     } catch (error) {
         console.error("Error mengambil semua item:", error);
@@ -103,7 +115,7 @@ const deleteItemByAdmin = async (req, res) => {
             try { fs.unlinkSync(item.image_url); } catch(err){ console.error(err); }
         }
         
-        res.redirect('/admin/items'); // Kembali ke halaman moderasi item
+        res.redirect('/admin/items');
     } catch (error) {
         console.error("Error delete item by admin:", error);
         res.status(500).send('Error Server');

@@ -1,10 +1,12 @@
 const db = require('../../config/db');
 const bcrypt = require('bcryptjs');
-const fs = require('fs');
+const fs = require('fs'); // Diperlukan untuk menghapus foto lama
 
 class User {
 
-    // --- 1. FUNGSI DATABASE MURNI (MODEL) ---
+    // ==========================================
+    // 1. FUNGSI DATABASE MURNI (MODEL)
+    // ==========================================
 
     static async create(newUser) {
         const { username, email, password, phone_number, profile_picture_url } = newUser;
@@ -19,8 +21,20 @@ class User {
         return rows[0];
     }
     
+    /**
+     * [ADMIN] Mengambil semua pengguna + Status Online
+     */
     static async findAll() {
-        const sql = 'SELECT id, username, email, phone_number, role, status, created_at FROM users ORDER BY created_at DESC';
+        const sql = `
+            SELECT 
+                id, username, email, phone_number, role, status, created_at, last_active,
+                CASE 
+                    WHEN last_active > (NOW() - INTERVAL 5 MINUTE) THEN 1 
+                    ELSE 0 
+                END AS is_online
+            FROM users 
+            ORDER BY is_online DESC, last_active DESC
+        `;
         const [rows] = await db.execute(sql);
         return rows;
     }
@@ -37,6 +51,29 @@ class User {
         return result.affectedRows > 0;
     }
 
+    /**
+     * [ADMIN] Mencari pengguna untuk dashboard admin
+     */
+    static async searchForAdmin(query) {
+        const sql = `
+            SELECT 
+                id, username, email, role, status, created_at, last_active,
+                CASE 
+                    WHEN last_active > (NOW() - INTERVAL 5 MINUTE) THEN 1 
+                    ELSE 0 
+                END AS is_online
+            FROM users 
+            WHERE username LIKE ? OR email LIKE ?
+            ORDER BY is_online DESC, last_active DESC
+        `;
+        const searchTerm = `%${query}%`;
+        const [rows] = await db.execute(sql, [searchTerm, searchTerm]);
+        return rows;
+    }
+
+    /**
+     * [PUBLIC] Mencari pengguna untuk halaman Explore
+     */
     static async searchByUsername(query) {
         const sql = 'SELECT id, username, profile_picture_url FROM users WHERE username LIKE ? LIMIT 20';
         const [rows] = await db.execute(sql, [`%${query}%`]);
@@ -49,26 +86,19 @@ class User {
         return rows[0];
     }
 
+    static async updateLastActive(id) {
+        const sql = 'UPDATE users SET last_active = NOW() WHERE id = ?';
+        await db.execute(sql, [id]);
+    }
+
     static async updateById(id, data) {
         const fields = [];
         const params = [];
 
-        if (data.username) {
-            fields.push('username = ?');
-            params.push(data.username);
-        }
-        if (data.email) {
-            fields.push('email = ?');
-            params.push(data.email);
-        }
-        if (data.phone_number) {
-            fields.push('phone_number = ?');
-            params.push(data.phone_number);
-        }
-        if (data.profile_picture_url) {
-            fields.push('profile_picture_url = ?');
-            params.push(data.profile_picture_url);
-        }
+        if (data.username) { fields.push('username = ?'); params.push(data.username); }
+        if (data.email) { fields.push('email = ?'); params.push(data.email); }
+        if (data.phone_number) { fields.push('phone_number = ?'); params.push(data.phone_number); }
+        if (data.profile_picture_url) { fields.push('profile_picture_url = ?'); params.push(data.profile_picture_url); }
         if (data.password) {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(data.password, salt);
@@ -85,9 +115,12 @@ class User {
         return result.affectedRows > 0;
     }
 
-    // --- 2. FUNGSI LOGIKA HTTP (HANDLERS) ---
+    // ==========================================
+    // 2. FUNGSI LOGIKA HTTP (CONTROLLER HANDLERS)
+    // ==========================================
 
-    // Handler Auth
+    // --- Auth Handlers ---
+
     static async handleGetLoginPage(req, res) {
         res.render('login', { title: 'Login ke Odt\'s' });
     }
@@ -100,15 +133,19 @@ class User {
         try {
             const { username, email, password, phone_number } = req.body;
             let profilePictureUrl = null;
+            
             if (req.file) {
                 profilePictureUrl = req.file.path.replace(/\\/g, "/");
             }
+            
             const userExists = await User.findByEmail(email);
             if (userExists) {
                 return res.status(400).send('Email sudah terdaftar.');
             }
+            
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
+            
             await User.create({ 
                 username, 
                 email, 
@@ -116,6 +153,7 @@ class User {
                 phone_number,
                 profile_picture_url: profilePictureUrl
             });
+            
             res.redirect('/auth/login');
         } catch (error) {
             console.error("Error saat registrasi:", error);
@@ -127,22 +165,31 @@ class User {
         try {
             const { email, password } = req.body;
             const user = await User.findByEmail(email);
+            
             if (!user) {
                 return res.status(400).send('Email atau password salah.');
             }
+            
             if (user.status === 'banned') {
                 return res.status(403).send('Akun Anda telah diblokir.');
             }
+
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
                 return res.status(400).send('Email atau password salah.');
             }
+            
+            // Simpan data ke sesi
             req.session.userId = user.id;
             req.session.username = user.username;
             req.session.email = user.email;
             req.session.role = user.role;
             req.session.phoneNumber = user.phone_number;
             req.session.profilePicture = user.profile_picture_url;
+            
+            // Update last active saat login
+            await User.updateLastActive(user.id);
+
             if (user.role === 'admin') {
                 res.redirect('/admin/dashboard');
             } else {
@@ -162,13 +209,16 @@ class User {
         });
     }
 
-    // Handler Edit Profil
+    // --- Edit Profil Handlers ---
+
     static async handleGetEditProfilePage(req, res) {
         try {
-            const user = await User.findById(req.session.userId); // Ambil data terbaru
+            const user = await User.findByEmail(req.session.email); 
+            
             if (!user) {
                 return res.redirect('/auth/login');
             }
+            
             res.render('editProfile', {
                 title: 'Edit Profil',
                 user: user,
@@ -184,7 +234,7 @@ class User {
         try {
             const userId = req.session.userId;
             const { username, email, phone_number, password } = req.body;
-            const currentUser = await User.findById(userId); // Ambil data lama
+            const currentUser = await User.findByEmail(req.session.email); 
             
             const updatedData = {
                 username: username,
@@ -208,7 +258,7 @@ class User {
             
             await User.updateById(userId, updatedData);
 
-            // Update sesi
+            // Update data di sesi
             req.session.username = updatedData.username;
             req.session.email = updatedData.email;
             if (updatedData.phone_number) req.session.phoneNumber = updatedData.phone_number;

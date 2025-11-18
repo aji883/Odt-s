@@ -7,7 +7,7 @@ const itemRoutes = require('./src/routes/itemRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
-const transactionRoutes = require('./src/routes/transactionRoutes');
+const transactionRoutes = require('./src/routes/transactionRoutes'); // Impor rute transaksi
 
 const app = express();
 const PORT = 3000;
@@ -20,9 +20,7 @@ app.use(session({
     cookie: { secure: false } 
 }));
 
-
-// --- MIDDLEWARE BARU: Membuat data user global untuk EJS ---
-// (Letakkan middleware ini SETELAH app.use(session(...)) dan SEBELUM app.use(routes...))
+// --- MIDDLEWARE: Membuat data user global untuk EJS ---
 app.use((req, res, next) => {
     if (req.session.userId) {
         // Jika user login, buat variabel 'user' yang bisa diakses di semua EJS
@@ -38,15 +36,14 @@ app.use((req, res, next) => {
         // Jika tidak login, variabel 'user' akan null
         res.locals.user = null;
     }
-    next(); // Lanjutkan ke middleware atau rute berikutnya
+    next();
 });
-// --- AKHIR MIDDLEWARE BARU ---
-
 
 // Pengaturan View Engine & Aset Statis
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
 
+// Mengizinkan akses ke folder 'public' (CSS, JS) dan 'uploads' (gambar)
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -59,7 +56,7 @@ app.use('/', itemRoutes);
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes); 
-app.use('/transactions', transactionRoutes);
+app.use('/transactions', transactionRoutes); // Daftarkan rute transaksi
 
 // Menjalankan server pada port yang ditentukan
 app.listen(PORT, () => {

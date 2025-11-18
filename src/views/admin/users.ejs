@@ -4,76 +4,324 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
+    
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #222; color: #eee; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #555; padding: 10px; text-align: left; }
-        th { background-color: #333; }
-        .nav-links { margin-bottom: 20px; }
-        .nav-links a { color: #bbb; text-decoration: none; margin-right: 15px; }
-        .nav-links a.logout { color: #f39c12; font-weight: bold; }
-        .btn { border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; color: white; text-decoration: none; display: inline-block; }
-        .btn-delete { background-color: #e74c3c; } .btn-delete:hover { background-color: #c0392b; }
-        .btn-ban { background-color: #f39c12; } .btn-ban:hover { background-color: #e67e22; }
-        .btn-unban { background-color: #2ecc71; } .btn-unban:hover { background-color: #27ae60; }
-        .status-banned { color: #e74c3c; font-weight: bold; }
-        .status-active { color: #2ecc71; }
+        /* =================================
+           ADMIN STYLESHEET (INTERNAL)
+           ================================= */
+
+        /* --- Global & Theme --- */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background-color: #1e1e2f; /* Background dashboard gelap */
+            color: #f0f0f0;
+            line-height: 1.6;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* --- Admin Header & Navigasi --- */
+        .admin-header {
+            background-color: #2a2a40; /* Warna panel */
+            padding: 1.5rem 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border: 1px solid #3a3a5a;
+        }
+
+        .admin-header h1 {
+            margin: 0 0 1rem 0;
+            color: #fff;
+            font-size: 1.8rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav a {
+            color: #ccc;
+            text-decoration: none;
+            margin-right: 15px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .admin-nav a:hover {
+            background-color: #3a3a5a;
+            color: #fff;
+        }
+        .admin-nav a.active {
+            background-color: #7b40f5; /* Warna aksen (ungu) */
+            color: #fff;
+        }
+        .admin-nav a.logout {
+            margin-left: auto; /* Dorong ke kanan */
+            color: #f39c12;
+        }
+        .admin-nav a.logout:hover {
+            background-color: #f39c12;
+            color: #1e1e2f;
+        }
+
+        /* --- Fitur Pencarian --- */
+        .search-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: flex-end; /* Posisi di kanan */
+        }
+
+        .admin-search-form {
+            display: flex;
+            gap: 10px;
+            background: #2a2a40;
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid #3a3a5a;
+        }
+
+        .admin-search-form input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            padding: 8px 12px;
+            outline: none;
+            min-width: 250px;
+        }
+
+        /* Tombol Cari */
+        .btn-search {
+            background-color: #7b40f5;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-search:hover {
+            background-color: #6a30d1;
+        }
+
+        /* Tombol Reset */
+        .btn-reset {
+            background-color: #4a4a6a;
+            color: #ccc;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+        }
+        .btn-reset:hover {
+            background-color: #5a5a7a;
+            color: #fff;
+        }
+
+        /* --- Tabel Admin --- */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #2a2a40;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #3a3a5a;
+        }
+
+        .admin-table th, 
+        .admin-table td {
+            border-bottom: 1px solid #3a3a5a;
+            padding: 15px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .admin-table th {
+            background-color: #252538;
+            color: #aaa;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .admin-table tr:hover {
+            background-color: #31314a;
+        }
+
+        /* --- Tombol Aksi --- */
+        .btn {
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            margin-right: 5px;
+        }
+        .btn-delete { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; } 
+        .btn-delete:hover { background-color: #e74c3c; color: #fff; }
+
+        .btn-ban { background-color: rgba(243, 156, 18, 0.2); color: #f39c12; border: 1px solid #f39c12; } 
+        .btn-ban:hover { background-color: #f39c12; color: #fff; }
+
+        .btn-unban { background-color: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; } 
+        .btn-unban:hover { background-color: #2ecc71; color: #fff; }
+
+        /* --- Status Badges --- */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-banned { color: #e74c3c; background-color: rgba(231, 76, 60, 0.1); }
+        .status-active { color: #2ecc71; background-color: rgba(46, 204, 113, 0.1); }
+
+        /* --- Indikator Online/Offline --- */
+        .user-status-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dot-online, .dot-offline {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .dot-online {
+            background-color: #2ecc71;
+            box-shadow: 0 0 8px rgba(46, 204, 113, 0.6);
+        }
+        .dot-offline {
+            background-color: #555;
+            border: 1px solid #777;
+        }
+        .username-text {
+            font-weight: 600;
+            color: #fff;
+        }
+        .email-text {
+            font-size: 0.9em;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
-    <h1>Manajemen Pengguna</h1>
-    
-    <p class="nav-links">
-        <a href="/admin/dashboard">Dashboard</a> | 
-        <a href="/admin/items">Moderasi Item</a> |
-        <a href="/auth/logout" class="logout">Logout</a>
-    </p>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Manajemen Pengguna</h1>
+            <nav class="admin-nav">
+                <a href="/admin/dashboard">Dashboard</a>
+                <a href="/admin/users" class="active">Manajemen Pengguna</a>
+                <a href="/admin/items">Moderasi Item</a>
+                <a href="/auth/logout" class="logout">Logout</a>
+            </nav>
+        </header>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Tindakan</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% if(users && users.length > 0) { %>
-                <% users.forEach(user => { %>
-                    <tr>
-                        <td><%= user.id %></td>
-                        <td><%= user.username %></td>
-                        <td><%= user.email %></td>
-                        <td><%= user.role %></td>
-                        <td>
-                            <span class="status-<%= user.status %>"><%= user.status %></span>
-                        </td>
-                        <td>
-                            <form action="/admin/users/<%= user.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MENGHAPUS pengguna ini? Ini tidak bisa dikembalikan.');">
-                                <button type="submit" class="btn btn-delete">Hapus</button>
-                            </form>
-                            
-                            <% if(user.status === 'active') { %>
-                                <form action="/admin/users/<%= user.id %>/ban" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MEMBLOKIR pengguna ini?');">
-                                    <button type="submit" class="btn btn-ban">Blokir</button>
-                                </form>
-                            <% } else { %>
-                                <form action="/admin/users/<%= user.id %>/unban" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MEMBUKA BLOKIR pengguna ini?');">
-                                    <button type="submit" class="btn btn-unban">Buka Blokir</button>
-                                </form>
-                            <% } %>
-                        </td>
-                    </tr>
-                <% }) %>
-            <% } else { %>
-                <tr>
-                    <td colspan="6">Tidak ada pengguna ditemukan.</td>
-                </tr>
-            <% } %>
-        </tbody>
-    </table>
+        <main>
+            <div class="search-container">
+                <form action="/admin/users" method="GET" class="admin-search-form">
+                    <input type="text" name="search" placeholder="Cari username atau email..." value="<%= typeof searchQuery != 'undefined' ? searchQuery : '' %>">
+                    <button type="submit" class="btn-search">Cari</button>
+                    <% if (typeof searchQuery != 'undefined' && searchQuery) { %>
+                        <a href="/admin/users" class="btn-reset">Reset</a>
+                    <% } %>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Pengguna</th>
+                            <th>Role</th>
+                            <th>Status Akun</th>
+                            <th>Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(users && users.length > 0) { %>
+                            <% users.forEach(user => { %>
+                                <tr>
+                                    <td>#<%= user.id %></td>
+                                    <td>
+                                        <div class="user-status-container">
+                                            <% if (user.is_online) { %>
+                                                <span class="dot-online" title="Sedang Online"></span>
+                                            <% } else { %>
+                                                <span class="dot-offline" title="Offline"></span>
+                                            <% } %>
+                                            <div>
+                                                <div class="username-text"><%= user.username %></div>
+                                                <div class="email-text"><%= user.email %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><%= user.role %></td>
+                                    <td>
+                                        <span class="status-badge status-<%= user.status %>"><%= user.status %></span>
+                                    </td>
+                                    <td>
+                                        <form action="/admin/users/<%= user.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MENGHAPUS pengguna ini? Ini tidak bisa dikembalikan.');">
+                                            <button type="submit" class="btn btn-delete">Hapus</button>
+                                        </form>
+                                        
+                                        <% if(user.status === 'active') { %>
+                                            <form action="/admin/users/<%= user.id %>/ban" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MEMBLOKIR pengguna ini?');">
+                                                <button type="submit" class="btn btn-ban">Blokir</button>
+                                            </form>
+                                        <% } else { %>
+                                            <form action="/admin/users/<%= user.id %>/unban" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin MEMBUKA BLOKIR pengguna ini?');">
+                                                <button type="submit" class="btn btn-unban">Buka Blokir</button>
+                                            </form>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" style="text-align:center; color: #aaa; padding: 2rem;">
+                                    <% if (typeof searchQuery != 'undefined' && searchQuery) { %>
+                                        Tidak ada pengguna yang cocok dengan "<strong><%= searchQuery %></strong>".
+                                    <% } else { %>
+                                        Tidak ada pengguna ditemukan.
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

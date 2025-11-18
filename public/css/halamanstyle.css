@@ -578,88 +578,246 @@ body.page-profile {
 /* Profile Card Actions - Now handled by General Components */
 
 /* =================================
-   6. ITEM DETAIL PAGE SPECIFIC STYLES (ITEMDETAIL.EJS)
+   STYLE KHUSUS HALAMAN DETAIL ITEM (FINAL)
    ================================= */
+
+/* Container Utama dengan efek Glassmorphism */
 .item-detail-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
-    padding: 2rem;
-    background: var(--glass-bg);
-    border-radius: 15px;
-    margin-top: 2rem;
+    gap: 3rem; /* Jarak antara kolom foto dan info */
+    padding: 2.5rem;
+    background: var(--glass-bg, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
+    border-radius: 20px;
+    margin-top: 1.5rem;
     color: #eee;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 }
 
+/* --- Kolom Kiri: Foto Item --- */
 .item-detail-image {
-    flex: 1 1 40%;
-    max-width: 450px;
-    min-width: 250px;
+    flex: 1 1 400px; /* Fleksibel, minimal 400px */
+    max-width: 500px; /* Batas lebar agar tidak terlalu besar */
 }
 
 .item-detail-image img {
     width: 100%;
     height: auto;
-    border-radius: 10px;
+    border-radius: 15px;
     object-fit: cover;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     display: block;
 }
 
+/* --- Kolom Kanan: Informasi Item --- */
 .item-detail-info {
-    flex: 2 1 55%;
-    min-width: 300px;
-}
-.item-detail-info h1 { color: #fff; margin-top: 0; }
-.item-owner a { color: #bbb; }
-.item-meta {
-    font-size: 0.9em;
-    color: #ccc;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 1rem;
+    flex: 1 1 400px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
+    flex-direction: column;
 }
-.item-meta span { white-space: nowrap; }
 
-.item-description {
-    margin-bottom: 2rem;
-    line-height: 1.7;
+/* 1. Header: Judul & Tombol Favorit Sejajar */
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Agar bintang sejajar dengan baris pertama judul */
+    gap: 1rem;
+    margin-bottom: 0.5rem;
 }
-.item-description h3 { margin-top: 0; }
-.item-actions .btn, .item-actions button {
-    margin-right: 10px;
-    margin-bottom: 10px;
+
+.item-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0;
+    color: #fff;
+    line-height: 1.2;
+    flex-grow: 1; /* Judul mengambil sisa ruang */
 }
-.item-actions form { display: inline-block; }
 
-
-/* Favorite Button Section */
+/* 2. Styling Tombol Bintang (Favorit) */
 .favorite-section {
-   display: flex;
-   align-items: center;
-   gap: 0.5rem;
-   flex-shrink: 0;
-   margin-left: auto;
-   padding-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Pusatkan bintang dan teks jumlah */
+    flex-shrink: 0; /* Agar tidak mengecil */
+}
+
+.favorite-form {
+    margin: 0;
 }
 
 .btn-favorite {
     background: none;
     border: none;
-    font-size: 2.2rem;
+    font-size: 2.2rem; /* Ukuran bintang besar */
     cursor: pointer;
-    padding: 0 5px;
-    color: #ccc;
-    transition: color 0.2s ease, transform 0.2s ease;
+    color: #555; /* Warna default (abu-abu/mati) */
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s;
+    padding: 0;
+    line-height: 1;
 }
+
+/* Warna kuning jika class 'favorited' ada (dikirim dari backend) */
+.btn-favorite.favorited {
+    color: #f1c40f; 
+    text-shadow: 0 0 10px rgba(241, 196, 15, 0.5); /* Efek glow kuning */
+}
+
 .btn-favorite:hover {
-    color: #f1c40f;
-    transform: scale(1.2);
+    transform: scale(1.2); /* Efek membesar saat di-hover */
+    color: #f1c40f; /* Preview warna kuning saat hover */
 }
-.btn-favorite.favorited { color: #f1c40f; }
-.favorite-count { color: var(--text-secondary, #ccc); font-size: 0.9em; white-space: nowrap; }
+
+.favorite-count {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-top: 2px;
+    white-space: nowrap;
+}
+
+/* 3. Styling Harga (Besar & Menonjol) */
+.item-price-tag {
+    font-size: 2rem; 
+    font-weight: 700;
+    color: #2ecc71; /* Warna hijau neon */
+    margin-bottom: 1rem;
+    display: block;
+    letter-spacing: 0.5px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* 4. Info Pemilik */
+.item-owner {
+    font-size: 1rem;
+    color: #bbb;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1); /* Garis pemisah */
+}
+.item-owner a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.item-owner a:hover {
+    text-decoration: underline;
+    color: var(--accent-color);
+}
+
+/* 5. Meta Data (Badges) */
+.item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 2rem;
+}
+
+.meta-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 50px; /* Bentuk pil */
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ddd;
+    white-space: nowrap;
+}
+
+.meta-badge strong {
+    color: #fff;
+    margin-right: 5px;
+}
+
+/* 6. Deskripsi */
+.item-description {
+    background: rgba(0, 0, 0, 0.2); /* Background lebih gelap untuk teks */
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.item-description h3 {
+    margin-top: 0;
+    color: #fff;
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.item-description p {
+    line-height: 1.7;
+    color: #ccc;
+    margin: 0;
+    white-space: pre-wrap; /* Menjaga baris baru dari input textarea */
+}
+
+/* 7. Tombol Aksi (Bawah) */
+.item-actions {
+    margin-top: auto; /* Dorong ke bawah jika ada ruang sisa */
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.item-actions form {
+    display: inline-block;
+    flex: 1; /* Agar tombol dalam form mengisi ruang */
+}
+
+/* Tombol Kembali (Panah) */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%; /* Bulat */
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn-back:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: translateX(-3px); /* Efek geser sedikit ke kiri */
+}
+
+/* Responsive untuk Layar Kecil */
+@media (max-width: 768px) {
+    .item-detail-container {
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+    .item-detail-image, .item-detail-info {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+    .item-header h1 {
+        font-size: 1.8rem;
+    }
+    .item-price-tag {
+        font-size: 1.5rem;
+    }
+    .item-actions {
+        flex-direction: column;
+    }
+    .item-actions .btn, .item-actions form {
+        width: 100%;
+    }
+    .item-actions button, .item-actions a {
+        width: 100%;
+        text-align: center;
+    }
+}
 
 /* =================================
    7. FORM STYLES (LOGIN, REGISTER, EDIT ITEM)
@@ -963,7 +1121,6 @@ body.page-profile {
    TOMBOL KEMBALI (BTN-BACK)
    ================================= */
 .btn-back {
-    display: inline-block;
     margin-top: 1.5rem;
     margin-bottom: 1rem; /* Sedikit jarak dari konten di bawahnya */
     padding: 8px 16px;
@@ -971,7 +1128,7 @@ body.page-profile {
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #eee;
     text-decoration: none;
-    border-radius: 8px;
+    border-radius: 68px;
     font-weight: 500;
     transition: background-color 0.2s ease;
 }
@@ -984,133 +1141,239 @@ body.page-profile {
 }
 
 /* =================================
-   10. STYLE HALAMAN EXPLORE (BARU)
+   STYLE KHUSUS HALAMAN EXPLORE (REMASTERED)
    ================================= */
 
-/* Tema background khusus untuk halaman Explore */
-body.page-explore {
-    background: linear-gradient(110deg, #200e2f 0%, #1e53b1 100%);
-    background-attachment: fixed;
-}
-
+/* Container Utama Explore */
 .explore-container {
     max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 80vh; /* Agar konten mengisi layar */
 }
 
+/* --- Header Explore (Judul & Search) --- */
 .explore-header {
     text-align: center;
-    margin-bottom: 2rem;
-    padding: 2rem;
-    background: var(--glass-bg);
-    border-radius: 15px;
-    border: 1px solid var(--glass-border);
+    margin-bottom: 3rem;
+    padding: 3rem 2rem;
+    background: var(--glass-bg, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
 }
+
 .explore-header h1 {
     color: #fff;
     margin-top: 0;
     margin-bottom: 0.5rem;
+    font-size: 2.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
+
 .explore-header p {
     color: #ccc;
     font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-}
-
-/* Search Bar */
-.search-bar-container {
-    max-width: 500px;
-    margin: 0 auto;
-}
-.search-form {
-    display: flex;
-    width: 100%;
-}
-.search-form input[type="text"] {
-    flex-grow: 1;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.1);
-    padding: 12px 15px;
-    font-size: 1rem;
-    color: #fff;
-    border-radius: 10px 0 0 10px;
-    outline: none;
-}
-.btn-search {
-    padding: 12px 20px;
-    font-size: 1rem;
-    color: #fff;
-    background-color: #1211a7;
-    border: none;
-    border-radius: 0 10px 10px 0;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-.btn-search:hover {
-    background-color: #6082f0;
-}
-
-/* Konten Explore */
-.explore-content h2 {
-    color: #fff;
-    text-align: center;
-    font-size: 2rem;
     margin-bottom: 2rem;
 }
 
-/* Grid Hasil Pencarian User */
+/* Search Bar Styling */
+.search-bar-container {
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.search-form {
+    display: flex;
+    width: 100%;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+
+.search-form:focus-within {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgba(123, 64, 245, 0.3); /* Glow ungu saat diketik */
+}
+
+.search-form input[type="text"] {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+    color: #fff;
+    outline: none;
+}
+
+.search-form input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-search {
+    padding: 10px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #7b40f5, #a6d7f5); /* Gradien tombol */
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-search:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(123, 64, 245, 0.4);
+}
+
+/* --- Konten Explore --- */
+.explore-content h2 {
+    color: #fff;
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.explore-content h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--accent-color, #7b40f5);
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+/* --- Grid Hasil Pencarian User --- */
 .user-results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
 }
+
 .user-card {
-    background: var(--glass-bg);
-    border-radius: 15px;
-    border: 1px solid var(--glass-border);
-    padding: 1.5rem;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-bg, rgba(255,255,255,0.1));
+    border-radius: 20px;
+    border: 1px solid var(--glass-border, rgba(255,255,255,0.2));
+    padding: 2rem 1rem;
     text-decoration: none;
     color: #fff;
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
 }
+
 .user-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
+
+/* Foto Profil di User Card */
 .user-avatar-placeholder {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    margin: 0 auto 1rem;
+    object-fit: cover; /* Agar gambar bulat sempurna tidak gepeng */
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 1rem;
+    background-color: rgba(0,0,0,0.2);
+    transition: border-color 0.3s ease;
 }
+
+.user-card:hover .user-avatar-placeholder {
+    border-color: var(--accent-color, #7b40f5);
+}
+
 .user-card h3 {
     margin: 0;
     font-size: 1.1rem;
+    font-weight: 600;
+    color: #eee;
+    text-align: center;
 }
 
-/* Grid Item di Halaman Explore (lebih simpel) */
-.explore-grid .item-card {
-    padding: 0; /* Hapus padding default .item-card */
-    text-align: left;
+/* --- Grid Postingan Acak --- */
+/* Menggunakan grid yang sama dengan homepage tapi dengan style khusus */
+.explore-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
 }
-.explore-grid .item-card h3 { /* Hapus h3 jika tidak dipakai */
-   display: none;
+
+.explore-item-card {
+    /* Memanfaatkan style .item-card yang sudah ada, plus override */
+    background: var(--glass-bg, rgba(255,255,255,0.1));
+    border: 1px solid var(--glass-border, rgba(255,255,255,0.2));
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
-.explore-grid .item-card .item-image {
-    border-radius: 15px 15px 0 0; /* Hanya sudut atas */
-    margin-bottom: 0;
+
+.explore-item-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    z-index: 2;
 }
+
+/* Gambar di kartu explore */
+.explore-item-card .item-image {
+    width: 100%;
+    height: 300px; /* Tinggi tetap agar rapi */
+    object-fit: cover;
+    display: block;
+    border-radius: 15px 15px 0 0;
+}
+
+/* Info di bawah gambar (Nama Pemilik) */
 .explore-card-info {
     padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.2); /* Background sedikit gelap untuk teks */
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
+
 .item-owner-username {
     font-size: 0.9rem;
-    color: #ccc;
+    color: #bbb;
     font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .explore-header {
+        padding: 2rem 1rem;
+    }
+    .explore-header h1 {
+        font-size: 2rem;
+    }
+    .search-form input[type="text"] {
+        font-size: 0.9rem;
+    }
+    .user-results-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    .user-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+    }
 }
 
 /* =================================

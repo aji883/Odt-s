@@ -9,7 +9,6 @@ class Transaction {
      * Membuat tawaran baru (buy/swap)
      */
     static async create(data) {
-        // Ambil kolom baru untuk alamat & pembayaran
         const { itemId, proposerUserId, ownerUserId, type, message, shipping_address, payment_method } = data;
         const sql = `INSERT INTO transactions (item_id, proposer_user_id, owner_user_id, type, message, status, shipping_address, payment_method)
                      VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)`;
@@ -284,13 +283,21 @@ class Transaction {
                 itemsForSwap = await Item.findSwappableByUserId(req.session.userId);
             }
 
+            // Cek status favorit
+            let isFavorited = false;
+            if (req.session.userId) {
+                const Favorite = require('./Favorite'); // Impor di sini untuk menghindari circular dependency
+                isFavorited = await Favorite.check(req.session.userId, transaction.item_main_id);
+            }
+
             res.render('transactionDetail', {
                 title: `Detail Transaksi #${transaction.id}`,
                 transaction: transaction,
                 isOwner: isOwner,
                 isProposer: isProposer,
                 itemsForSwap: itemsForSwap, // itemsForSwap akan kosong jika item sudah dipilih
-                bodyClass: 'page-profile'
+                bodyClass: 'page-profile',
+                isFavorited: isFavorited
             });
         } catch (error) {
             console.error("Error get transaction detail:", error);
@@ -480,6 +487,38 @@ class Transaction {
 
         } catch (error) {
              console.error("Error saat menyembunyikan tawaran:", error);
+             res.status(500).send('Error Server');
+        }
+    }
+    
+    /**
+     * @desc    Penawar mengonfirmasi pesanan telah diterima
+     * @route   POST /transactions/:id/complete
+     */
+    static async handleCompleteTransaction(req, res) {
+        try {
+            const transactionId = req.params.id;
+            const userId = req.session.userId;
+
+            const transaction = await Transaction.findById(transactionId);
+            if (!transaction) {
+                return res.status(404).send('Transaksi tidak ditemukan.');
+            }
+
+            if (transaction.proposer_user_id !== userId) {
+                return res.status(403).send('Akses ditolak.');
+            }
+
+            if (transaction.status !== 'accepted') {
+                return res.status(400).send('Tawaran ini belum diterima oleh penjual.');
+            }
+
+            await Transaction.updateStatus(transactionId, 'completed');
+            
+            res.redirect(`/transactions/${transactionId}`);
+
+        } catch (error) {
+             console.error("Error saat konfirmasi penerimaan:", error);
              res.status(500).send('Error Server');
         }
     }
