@@ -6,7 +6,9 @@ const User = require('./User');
 
 class Item {
 
-    // --- 1. FUNGSI DATABASE MURNI (MODEL) ---
+    // ==========================================
+    // 1. FUNGSI DATABASE MURNI (MODEL)
+    // ==========================================
 
     static async create(newItem) {
         const { title, description, category, size, status, price, imageUrl, userId } = newItem;
@@ -21,9 +23,6 @@ class Item {
         return rows;
     }
 
-    /**
-     * [FUNGSI YANG HILANG] Mencari item milik user yang BISA DI-SWAP
-     */
     static async findSwappableByUserId(userId) {
         const sql = 'SELECT * FROM items WHERE user_id = ? AND status = "Bisa di-Swap" ORDER BY created_at DESC';
         const [rows] = await db.execute(sql, [userId]);
@@ -50,6 +49,7 @@ class Item {
         const { title, description, category, size, status, price, imageUrl } = itemData;
         let sql;
         let params;
+
         if (imageUrl !== undefined) {
             sql = `UPDATE items SET title = ?, description = ?, category = ?, size = ?, status = ?, price = ?, image_url = ? WHERE id = ?`;
             params = [title, description, category, size, status, price, imageUrl, id];
@@ -57,7 +57,17 @@ class Item {
             sql = `UPDATE items SET title = ?, description = ?, category = ?, size = ?, status = ?, price = ? WHERE id = ?`;
             params = [title, description, category, size, status, price, id];
         }
+
         const [result] = await db.execute(sql, params);
+        return result.affectedRows > 0;
+    }
+
+    /**
+     * [PERBAIKAN PENTING] Fungsi untuk update status (misal: jadi 'Terjual')
+     */
+    static async updateItemStatus(id, status) {
+        const sql = 'UPDATE items SET status = ? WHERE id = ?';
+        const [result] = await db.execute(sql, [status, id]);
         return result.affectedRows > 0;
     }
 
@@ -102,7 +112,9 @@ class Item {
         return rows[0];
     }
 
-    // --- 2. FUNGSI LOGIKA HTTP (CONTROLLER) ---
+    // ==========================================
+    // 2. FUNGSI LOGIKA HTTP (CONTROLLER HANDLERS)
+    // ==========================================
     
     static async handleGetHomepage(req, res) {
         try {

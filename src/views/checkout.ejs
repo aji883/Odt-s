@@ -1,6 +1,6 @@
 <%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
 
-<a href="javascript:history.back()" class="btn-back">← Kembali</a>
+<a href="javascript:history.back()" class="btn-back">← </a>
 
 <div class="form-container">
     <h2>Konfirmasi Pembelian</h2>
@@ -14,7 +14,7 @@
         </p>
     </div>
     
-    <form action="/transactions/buy/<%= item.id %>" method="POST">
+    <form action="/transactions/buy/<%= item.id %>" method="POST" enctype="multipart/form-data">
         
         <div class="form-group">
             <label for="shipping_address">Alamat Pengiriman Lengkap</label>
@@ -23,11 +23,17 @@
         
         <div class="form-group">
             <label for="payment_method">Metode Pembayaran</label>
-            <select id="payment_method" name="payment_method" class="form-control" required>
+            <select id="payment_method" name="payment_method" class="form-control" required onchange="toggleProofInput()">
                 <option value="">-- Pilih Pembayaran --</option>
                 <option value="COD (Bayar di Tempat)">COD (Bayar di Tempat)</option>
                 <option value="Transfer Bank">Transfer Bank</option>
             </select>
+        </div>
+
+        <div class="form-group" id="proof-container" style="display: none;">
+            <label for="paymentProof">Upload Bukti Transfer</label>
+            <input type="file" id="paymentProof" name="paymentProof">
+            <small>Format: JPG, PNG. Wajib diisi untuk Transfer Bank.</small>
         </div>
 
         <button type="submit" class="btn btn-primary">Konfirmasi & Beli</button>
@@ -35,3 +41,20 @@
 </div>
 
 <%- include('partials/footer') %>
+
+<script>
+    function toggleProofInput() {
+        const paymentSelect = document.getElementById('payment_method');
+        const proofContainer = document.getElementById('proof-container');
+        const proofInput = document.getElementById('paymentProof');
+
+        if (paymentSelect.value === 'Transfer Bank') {
+            proofContainer.style.display = 'block'; // Tampilkan
+            proofInput.required = true; // Wajib diisi
+        } else {
+            proofContainer.style.display = 'none'; // Sembunyikan
+            proofInput.required = false; // Tidak wajib
+            proofInput.value = ''; // Reset file jika batal transfer
+        }
+    }
+</script>

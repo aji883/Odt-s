@@ -3,16 +3,18 @@ const Item = require('./Item'); // Kita butuh Item model
 
 class Transaction {
 
-    // --- 1. FUNGSI DATABASE (MODEL) ---
+    // ==========================================
+    // 1. FUNGSI DATABASE MURNI (MODEL)
+    // ==========================================
 
     /**
      * Membuat tawaran baru (buy/swap)
      */
     static async create(data) {
-        const { itemId, proposerUserId, ownerUserId, type, message, shipping_address, payment_method } = data;
-        const sql = `INSERT INTO transactions (item_id, proposer_user_id, owner_user_id, type, message, status, shipping_address, payment_method)
-                     VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)`;
-        const [result] = await db.execute(sql, [itemId, proposerUserId, ownerUserId, type, message, shipping_address, payment_method]);
+        const { itemId, proposerUserId, ownerUserId, type, message, shipping_address, payment_method, payment_proof_url } = data;
+        const sql = `INSERT INTO transactions (item_id, proposer_user_id, owner_user_id, type, message, status, shipping_address, payment_method, payment_proof_url)
+                     VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)`;
+        const [result] = await db.execute(sql, [itemId, proposerUserId, ownerUserId, type, message, shipping_address, payment_method, payment_proof_url]);
         return result.insertId;
     }
 
@@ -121,10 +123,12 @@ class Transaction {
         return result.affectedRows > 0;
     }
 
-    // --- 2. FUNGSI LOGIKA HTTP (CONTROLLER HANDLERS) ---
+    // ==========================================
+    // 2. FUNGSI LOGIKA HTTP (CONTROLLER HANDLERS)
+    // ==========================================
 
     /**
-     * @desc    [BELI - STEP 1] Menampilkan halaman checkout (form alamat/pembayaran)
+     * @desc    [BELI - STEP 1] Menampilkan halaman checkout
      * @route   GET /transactions/buy/:itemId
      */
     static async handleGetCheckoutPage(req, res) {
@@ -135,6 +139,12 @@ class Transaction {
             if (!item) {
                 return res.status(404).send('Item tidak ditemukan.');
             }
+
+            // Cek jika sudah terjual
+            if (item.status === 'Terjual') {
+                return res.status(400).send('Maaf, item ini sudah terjual.');
+            }
+
             if (item.status !== 'Dijual') {
                 return res.status(400).send('Item ini tidak sedang dijual.');
             }
@@ -154,7 +164,7 @@ class Transaction {
     }
 
     /**
-     * @desc    [BELI - STEP 2] Memproses pembelian setelah user isi form
+     * @desc    [BELI - STEP 2] Memproses pembelian
      * @route   POST /transactions/buy/:itemId
      */
     static async handleConfirmPurchase(req, res) {
@@ -167,6 +177,15 @@ class Transaction {
                 return res.status(400).send('Item ini tidak bisa dibeli.');
             }
             
+            // Validasi Bukti Transfer
+            let paymentProofUrl = null;
+            if (payment_method === 'Transfer Bank') {
+                if (!req.file) {
+                    return res.status(400).send('Wajib upload bukti transfer untuk metode Transfer Bank.');
+                }
+                paymentProofUrl = req.file.path.replace(/\\/g, "/");
+            }
+
             const transactionId = await Transaction.create({
                 itemId: item.id,
                 proposerUserId: req.session.userId,
@@ -174,7 +193,8 @@ class Transaction {
                 type: 'buy',
                 message: "Pengajuan pembelian",
                 shipping_address: shipping_address,
-                payment_method: payment_method
+                payment_method: payment_method,
+                payment_proof_url: paymentProofUrl
             });
             
             await Transaction.createDetail({
@@ -191,7 +211,7 @@ class Transaction {
     }
 
     /**
-     * @desc    [SWAP - STEP 1] Memulai alur barter (mengarahkan ke halaman pilih item)
+     * @desc    [SWAP - STEP 1] Memulai alur barter (langsung ke profil)
      * @route   GET /transactions/start-swap/:id
      */
     static async handleStartSwap(req, res) {
@@ -202,6 +222,11 @@ class Transaction {
             if (!item) {
                 return res.status(404).send('Item tidak ditemukan.');
             }
+
+            if (item.status === 'Terjual') {
+                return res.status(400).send('Maaf, item ini sudah tidak tersedia (Terjual/Tukar).');
+            }
+
             if (item.status !== 'Bisa di-Swap') {
                 return res.status(400).send('Item ini tidak tersedia untuk barter.');
             }
@@ -216,7 +241,8 @@ class Transaction {
                 type: 'swap',
                 message: "Tawaran barter dimulai",
                 shipping_address: null,
-                payment_method: null
+                payment_method: null,
+                payment_proof_url: null
             });
             
             await Transaction.createDetail({
@@ -225,7 +251,6 @@ class Transaction {
                 agreed_price: null
             });
             
-            // Arahkan ke halaman "pilih item" yang baru
             res.redirect(`/transactions/${transactionId}/select-item`);
         } catch (error) {
             console.error("Error starting swap:", error);
@@ -264,7 +289,7 @@ class Transaction {
     }
     
     /**
-     * @desc    Menampilkan Halaman Detail Transaksi (untuk konfirmasi / pilih item)
+     * @desc    Menampilkan Halaman Detail Transaksi
      * @route   GET /transactions/:id
      */
     static async handleGetTransactionDetail(req, res) {
@@ -278,7 +303,6 @@ class Transaction {
             if (!isOwner && !isProposer) return res.status(403).send('Akses ditolak.');
             
             let itemsForSwap = [];
-            // Logika ini dipindahkan ke handleSelectSwapPage, tapi tidak apa-apa jika tetap di sini
             if (transaction.type === 'swap' && isProposer && !transaction.offered_item_id) {
                 itemsForSwap = await Item.findSwappableByUserId(req.session.userId);
             }
@@ -286,7 +310,7 @@ class Transaction {
             // Cek status favorit
             let isFavorited = false;
             if (req.session.userId) {
-                const Favorite = require('./Favorite'); // Impor di sini untuk menghindari circular dependency
+                const Favorite = require('./Favorite');
                 isFavorited = await Favorite.check(req.session.userId, transaction.item_main_id);
             }
 
@@ -295,7 +319,7 @@ class Transaction {
                 transaction: transaction,
                 isOwner: isOwner,
                 isProposer: isProposer,
-                itemsForSwap: itemsForSwap, // itemsForSwap akan kosong jika item sudah dipilih
+                itemsForSwap: itemsForSwap,
                 bodyClass: 'page-profile',
                 isFavorited: isFavorited
             });
@@ -391,7 +415,6 @@ class Transaction {
     static async handleAcceptOffer(req, res) {
         try {
             const transactionId = req.params.id;
-            // TODO: Tambah validasi kepemilikan
             await Transaction.updateStatus(transactionId, 'accepted');
             res.redirect(`/transactions/${transactionId}`);
         } catch (error) {
@@ -407,7 +430,6 @@ class Transaction {
     static async handleRejectOffer(req, res) {
         try {
             const transactionId = req.params.id;
-            // TODO: Tambah validasi kepemilikan
             await Transaction.updateStatus(transactionId, 'rejected');
             res.redirect(`/transactions/${transactionId}`);
         } catch (error) {
@@ -492,7 +514,7 @@ class Transaction {
     }
     
     /**
-     * @desc    Penawar mengonfirmasi pesanan telah diterima
+     * @desc    Penawar mengonfirmasi pesanan telah diterima (Menyelesaikan Transaksi)
      * @route   POST /transactions/:id/complete
      */
     static async handleCompleteTransaction(req, res) {
@@ -504,16 +526,21 @@ class Transaction {
             if (!transaction) {
                 return res.status(404).send('Transaksi tidak ditemukan.');
             }
-
             if (transaction.proposer_user_id !== userId) {
                 return res.status(403).send('Akses ditolak.');
             }
-
             if (transaction.status !== 'accepted') {
                 return res.status(400).send('Tawaran ini belum diterima oleh penjual.');
             }
 
+            // 1. Update status Transaksi
             await Transaction.updateStatus(transactionId, 'completed');
+            
+            // 2. [BARU] Update status Item menjadi 'Terjual'
+            // (Memastikan fungsi updateItemStatus ada di Item model sebelum dipanggil)
+            if (Item.updateItemStatus) {
+                await Item.updateItemStatus(transaction.item_id, 'Terjual');
+            }
             
             res.redirect(`/transactions/${transactionId}`);
 
@@ -523,5 +550,24 @@ class Transaction {
         }
     }
 }
+
+// Salin semua fungsi handler
+Object.assign(Transaction, {
+    handleGetCheckoutPage: Transaction.handleGetCheckoutPage,
+    handleConfirmPurchase: Transaction.handleConfirmPurchase,
+    handleStartSwap: Transaction.handleStartSwap,
+    handleSelectSwapPage: Transaction.handleSelectSwapPage,
+    handleGetTransactionDetail: Transaction.handleGetTransactionDetail,
+    handleGetOffersHub: Transaction.handleGetOffersHub,
+    handleGetIncomingOffers: Transaction.handleGetIncomingOffers,
+    handleGetOutgoingOffers: Transaction.handleGetOutgoingOffers,
+    handleSelectSwapItem: Transaction.handleSelectSwapItem,
+    handleAcceptOffer: Transaction.handleAcceptOffer,
+    handleRejectOffer: Transaction.handleRejectOffer,
+    handleCancelOffer: Transaction.handleCancelOffer,
+    handleHideSentOffer: Transaction.handleHideSentOffer,
+    handleHideReceivedOffer: Transaction.handleHideReceivedOffer,
+    handleCompleteTransaction: Transaction.handleCompleteTransaction
+});
 
 module.exports = Transaction;

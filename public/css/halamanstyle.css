@@ -581,26 +581,27 @@ body.page-profile {
    STYLE KHUSUS HALAMAN DETAIL ITEM (FINAL)
    ================================= */
 
-/* Container Utama dengan efek Glassmorphism */
+/* Container Utama dengan Glassmorphism */
 .item-detail-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 3rem; /* Jarak antara kolom foto dan info */
+    gap: 3rem;
     padding: 2.5rem;
     background: var(--glass-bg, rgba(255, 255, 255, 0.1));
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
     border-radius: 20px;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     color: #eee;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 }
 
-/* --- Kolom Kiri: Foto Item --- */
+/* --- Kolom Kiri: Foto --- */
 .item-detail-image {
-    flex: 1 1 400px; /* Fleksibel, minimal 400px */
-    max-width: 500px; /* Batas lebar agar tidak terlalu besar */
+    flex: 1 1 400px;
+    max-width: 500px;
+    position: relative; /* Untuk overlay sold */
 }
 
 .item-detail-image img {
@@ -612,18 +613,30 @@ body.page-profile {
     display: block;
 }
 
-/* --- Kolom Kanan: Informasi Item --- */
+/* Overlay Terjual */
+.sold-overlay {
+    margin-top: 1rem;
+    background: rgba(231, 76, 60, 0.2);
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* --- Kolom Kanan: Info --- */
 .item-detail-info {
     flex: 1 1 400px;
     display: flex;
     flex-direction: column;
 }
 
-/* 1. Header: Judul & Tombol Favorit Sejajar */
+/* Header Judul */
 .item-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Agar bintang sejajar dengan baris pertama judul */
+    align-items: flex-start;
     gap: 1rem;
     margin-bottom: 0.5rem;
 }
@@ -634,42 +647,45 @@ body.page-profile {
     margin: 0;
     color: #fff;
     line-height: 1.2;
-    flex-grow: 1; /* Judul mengambil sisa ruang */
+    flex-grow: 1;
 }
 
-/* 2. Styling Tombol Bintang (Favorit) */
+/* Harga Besar */
+.item-price-tag {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2ecc71; /* Hijau Neon */
+    margin-bottom: 1rem;
+    display: block;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.item-price-tag.sold-price {
+    color: #95a5a6;
+    text-decoration: line-through;
+}
+
+/* Tombol Favorit */
 .favorite-section {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Pusatkan bintang dan teks jumlah */
-    flex-shrink: 0; /* Agar tidak mengecil */
+    align-items: center;
+    flex-shrink: 0;
 }
-
-.favorite-form {
-    margin: 0;
-}
+.favorite-form { margin: 0; }
 
 .btn-favorite {
     background: none;
     border: none;
-    font-size: 2.2rem; /* Ukuran bintang besar */
+    font-size: 2.2rem;
     cursor: pointer;
-    color: #555; /* Warna default (abu-abu/mati) */
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s;
+    color: #555;
+    transition: transform 0.2s;
     padding: 0;
     line-height: 1;
 }
-
-/* Warna kuning jika class 'favorited' ada (dikirim dari backend) */
-.btn-favorite.favorited {
-    color: #f1c40f; 
-    text-shadow: 0 0 10px rgba(241, 196, 15, 0.5); /* Efek glow kuning */
-}
-
-.btn-favorite:hover {
-    transform: scale(1.2); /* Efek membesar saat di-hover */
-    color: #f1c40f; /* Preview warna kuning saat hover */
-}
+.btn-favorite.favorited { color: #f1c40f; text-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
+.btn-favorite:hover { transform: scale(1.2); color: #f1c40f; }
 
 .favorite-count {
     font-size: 0.85rem;
@@ -678,67 +694,43 @@ body.page-profile {
     white-space: nowrap;
 }
 
-/* 3. Styling Harga (Besar & Menonjol) */
-.item-price-tag {
-    font-size: 2rem; 
-    font-weight: 700;
-    color: #2ecc71; /* Warna hijau neon */
-    margin-bottom: 1rem;
-    display: block;
-    letter-spacing: 0.5px;
-    font-family: 'Inter', sans-serif;
-}
-
-/* 4. Info Pemilik */
+/* Info Pemilik */
 .item-owner {
     font-size: 1rem;
     color: #bbb;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1); /* Garis pemisah */
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-.item-owner a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s;
-}
-.item-owner a:hover {
-    text-decoration: underline;
-    color: var(--accent-color);
-}
+.item-owner a { color: #fff; text-decoration: none; font-weight: 600; }
+.item-owner a:hover { text-decoration: underline; color: #7b40f5; }
 
-/* 5. Meta Data (Badges) */
-.item-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 2rem;
-}
+/* Meta Badge */
+.item-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 2rem; }
 
 .meta-badge {
     background: rgba(255, 255, 255, 0.1);
     padding: 8px 16px;
-    border-radius: 50px; /* Bentuk pil */
+    border-radius: 50px;
     font-size: 0.9rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #ddd;
-    white-space: nowrap;
+}
+.meta-badge strong { color: #fff; margin-right: 5px; }
+
+.meta-badge.status-sold {
+    background: #e74c3c;
+    color: white;
+    border: none;
 }
 
-.meta-badge strong {
-    color: #fff;
-    margin-right: 5px;
-}
-
-/* 6. Deskripsi */
+/* Deskripsi */
 .item-description {
-    background: rgba(0, 0, 0, 0.2); /* Background lebih gelap untuk teks */
+    background: rgba(0, 0, 0, 0.2);
     padding: 1.5rem;
     border-radius: 15px;
     margin-bottom: 2rem;
 }
-
 .item-description h3 {
     margin-top: 0;
     color: #fff;
@@ -748,75 +740,45 @@ body.page-profile {
     padding-bottom: 0.5rem;
     display: inline-block;
 }
-
 .item-description p {
     line-height: 1.7;
     color: #ccc;
     margin: 0;
-    white-space: pre-wrap; /* Menjaga baris baru dari input textarea */
+    white-space: pre-wrap;
 }
 
-/* 7. Tombol Aksi (Bawah) */
-.item-actions {
-    margin-top: auto; /* Dorong ke bawah jika ada ruang sisa */
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
+/* Tombol Aksi */
+.item-actions { margin-top: auto; display: flex; gap: 1rem; flex-wrap: wrap; }
+.item-actions form { display: inline-block; flex: 1; }
 
-.item-actions form {
-    display: inline-block;
-    flex: 1; /* Agar tombol dalam form mengisi ruang */
-}
-
-/* Tombol Kembali (Panah) */
+/* Tombol Kembali */
 .btn-back {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px;
     background-color: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%; /* Bulat */
-    color: #fff;
-    text-decoration: none;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    transition: background 0.3s, transform 0.2s;
+    border-radius: 50%; color: #fff; text-decoration: none;
+    font-size: 1.2rem; margin-bottom: 1rem; transition: background 0.3s;
 }
+.btn-back:hover { background-color: rgba(255, 255, 255, 0.25); }
 
-.btn-back:hover {
-    background-color: rgba(255, 255, 255, 0.25);
-    transform: translateX(-3px); /* Efek geser sedikit ke kiri */
+/* Tombol Disabled */
+.btn-disabled {
+    width: 100%;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
+.btn-block { width: 100%; text-align: center; }
 
-/* Responsive untuk Layar Kecil */
+/* Responsive */
 @media (max-width: 768px) {
-    .item-detail-container {
-        flex-direction: column;
-        padding: 1.5rem;
-    }
-    .item-detail-image, .item-detail-info {
-        flex: 1 1 100%;
-        max-width: 100%;
-    }
-    .item-header h1 {
-        font-size: 1.8rem;
-    }
-    .item-price-tag {
-        font-size: 1.5rem;
-    }
-    .item-actions {
-        flex-direction: column;
-    }
-    .item-actions .btn, .item-actions form {
-        width: 100%;
-    }
-    .item-actions button, .item-actions a {
-        width: 100%;
-        text-align: center;
-    }
+    .item-detail-container { flex-direction: column; padding: 1.5rem; }
+    .item-detail-image, .item-detail-info { flex: 1 1 100%; max-width: 100%; }
+    .item-header h1 { font-size: 1.8rem; }
+    .item-price-tag { font-size: 1.5rem; }
+    .item-actions { flex-direction: column; }
+    .item-actions .btn, .item-actions form { width: 100%; }
+    .item-actions button, .item-actions a { width: 100%; text-align: center; }
 }
 
 /* =================================

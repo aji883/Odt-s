@@ -1,18 +1,25 @@
 <%- include('partials/header', { title: title, bodyClass: typeof bodyClass != 'undefined' ? bodyClass : '' }) %>
 
-<a href="javascript:history.back()" class="btn-back">←</a>
+<a href="javascript:history.back()" class="btn-back">← </a>
 
 <div class="item-detail-container">
     <div class="item-detail-image">
         <img src="/<%= item.image_url %>" alt="<%= item.title %>">
+        
+        <% if(item.status === 'Terjual') { %>
+            <div class="sold-overlay">
+                ⛔ SOLD
+            </div>
+        <% } %>
     </div>
-    
+
     <div class="item-detail-info">
+        
         <div class="item-header">
             <h1><%= item.title %></h1>
 
             <div class="favorite-section">
-                <% if (!isOwner && user) { %>
+                <% if (!isOwner && user) { %> 
                     <form action="/items/<%= item.id %>/favorite" method="POST" class="favorite-form">
                         <button type="submit" class="btn-favorite <%= typeof isFavorited != 'undefined' && isFavorited ? 'favorited' : '' %>">⭐</button>
                     </form>
@@ -27,6 +34,10 @@
             <div class="item-price-tag">
                 Rp <%= item.price.toLocaleString('id-ID') %>
             </div>
+        <% } else if (item.status === 'Terjual') { %>
+             <div class="item-price-tag sold-price">
+                Rp <%= item.price ? item.price.toLocaleString('id-ID') : '-' %>
+            </div>
         <% } %>
 
         <p class="item-owner">
@@ -36,7 +47,12 @@
         <div class="item-meta">
             <span class="meta-badge"><strong>Kategori:</strong> <%= item.category %></span>
             <span class="meta-badge"><strong>Ukuran:</strong> <%= item.size %></span>
-            <span class="meta-badge"><strong>Status:</strong> <%= item.status %></span>
+            
+            <% if (item.status === 'Terjual') { %>
+                <span class="meta-badge status-sold"><strong>Status:</strong> TERJUAL</span>
+            <% } else { %>
+                <span class="meta-badge"><strong>Status:</strong> <%= item.status %></span>
+            <% } %>
         </div>
 
         <div class="item-description">
@@ -45,19 +61,29 @@
         </div>
 
         <div class="item-actions">
-             <% if (isOwner) { %>
+            <% if (item.status === 'Terjual') { %>
+                 <button class="btn btn-secondary btn-disabled" disabled>Barang Telah Terjual</button>
+                 
+                 <% if (isOwner) { %>
+                    <form action="/items/<%= item.id %>/delete" method="POST" style="display:inline; margin-left: 10px;" onsubmit="return confirm('Hapus item yang sudah terjual ini?');">
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                    </form>
+                 <% } %>
+
+            <% } else if (isOwner) { %>
                 <form action="/items/<%= item.id %>/edit">
-                    <button class="btn btn-secondary">Edit</button>
+                    <button class="btn btn-primary">Edit</button>
                 </form>
 
                 <form action="/items/<%= item.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus item ini?');">
-                    <button type="submit" class="btn btn-danger">Hapus</button>
+                    <button type="submit" class="btn btn-danger">Hapus Item</button>
                 </form>
+
             <% } else { %>
                 <% if (item.status === 'Dijual') { %>
-                    <a href="/transactions/buy/<%= item.id %>" class="btn btn-primary" style="width: 100%; text-align: center;">Beli Sekarang</a>
+                    <a href="/transactions/buy/<%= item.id %>" class="btn btn-primary btn-block">Beli Sekarang</a>
                  <% } else if (item.status === 'Bisa di-Swap') { %>
-                    <a href="/transactions/start-swap/<%= item.id %>" class="btn btn-primary" style="width: 100%; text-align: center;">Tawarkan Barter</a>
+                    <a href="/transactions/start-swap/<%= item.id %>" class="btn btn-primary btn-block">Tawarkan Barter</a>
                  <% } else { %>
                     <p><em>Item ini hanya untuk dipamerkan.</em></p>
                  <% } %>

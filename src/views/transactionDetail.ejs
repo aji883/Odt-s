@@ -1,6 +1,6 @@
 <%- include('partials/header', { title: title, bodyClass: bodyClass }) %>
 
-<a href="javascript:history.back()" class="btn-back">←</a>
+<a href="javascript:history.back()" class="btn-back">← </a>
 
 <div class="transaction-container">
     <div class="transaction-header">
@@ -58,10 +58,21 @@
                     <hr>
                     <p><strong>Alamat Pengiriman:</strong><br><%= transaction.shipping_address %></p>
                     <p><strong>Metode Pembayaran:</strong> <%= transaction.payment_method %></p>
+                    
+                    <% if (transaction.payment_method === 'Transfer Bank' && transaction.payment_proof_url) { %>
+                        <hr>
+                        <p><strong>Bukti Transfer:</strong></p>
+                        <div style="margin-top: 10px;">
+                            <a href="/<%= transaction.payment_proof_url %>" target="_blank">
+                                <img src="/<%= transaction.payment_proof_url %>" alt="Bukti Transfer" style="max-width: 100%; height: auto; border-radius: 5px; border: 1px solid #555;">
+                            </a>
+                        </div>
+                    <% } %>
                 </div>
             <% } %>
         </div>
     </div>
+    
     <% if (transaction.message) { %>
         <div class="transaction-message">
             <h4>Pesan Awal dari <%= transaction.proposer_username %>:</h4>
@@ -95,26 +106,31 @@
                     <button type="submit" class="btn btn-accept">📦 Pesanan Diterima</button>
                 </form>
             </div>
+
         <% } else if (transaction.status === 'completed') { %>
             <div class="transaction-status-info status-completed">
                 <h3>Transaksi Selesai</h3>
-                <p>Anda telah mengonfirmasi penerimaan item ini.</p>
+                <p>Anda telah mengonfirmasi penerimaan item ini. Transaksi berhasil ditutup.</p>
             </div>
+
         <% } else if (transaction.status === 'rejected') { %>
             <div class="transaction-status-info status-rejected">
                 <h3>Tawaran Ditolak</h3>
                 <p>Maaf, tawaran Anda ditolak oleh <strong><%= transaction.owner_username %></strong>.</p>
             </div>
+
         <% } else if (transaction.status === 'cancelled') { %>
              <div class="transaction-status-info status-cancelled">
                 <h3>Tawaran Dibatalkan</h3>
                 <p>Anda telah membatalkan tawaran ini.</p>
             </div>
+
         <% } else if (transaction.status === 'pending' && transaction.type === 'swap' && !transaction.offered_item_id) { %>
             <div class="transaction-status-info status-pending">
                 <h3>Lanjutkan Tawaran</h3>
                 <p>Anda harus memilih item dari LemaRI-ku Anda untuk ditukarkan.</p>
             </div>
+
         <% } else if (transaction.status === 'pending') { %>
             <div class="transaction-status-info status-pending">
                 <h3>Menunggu Konfirmasi</h3>
@@ -134,7 +150,7 @@
         gap: 2rem; 
         margin: 2rem 0; 
     }
-    .transaction-item h3 { color: #fff; }
+    .transaction-item h3 { color: #fff; margin-top: 0; }
     
     .transaction-details-box {
         background: var(--glass-bg, rgba(255, 255, 255, 0.1));
@@ -148,8 +164,15 @@
     
     .transaction-message { background: var(--bg-light, #222); padding: 1rem; border-radius: 5px; margin-top: 1rem; }
     .transaction-message.info { background: #3a3a5a; }
+    .transaction-message h4 { margin-top: 0; color: #ddd; font-size: 0.9em; }
     
-    .transaction-actions { background: var(--glass-bg, rgba(255, 255, 255, 0.1)); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--glass-border); margin-top: 2rem; }
+    .transaction-actions { 
+        background: var(--glass-bg, rgba(255, 255, 255, 0.1)); 
+        padding: 1.5rem; 
+        border-radius: 10px; 
+        border: 1px solid var(--glass-border); 
+        margin-top: 2rem; 
+    }
     .transaction-actions h3 { margin-top: 0; }
 
     /* Kotak Status untuk Penawar */
@@ -162,8 +185,10 @@
     .transaction-status-info h3 { margin-top: 0; margin-bottom: 0.5rem; color: #fff; }
     .transaction-status-info p { margin-bottom: 0; color: #eee; line-height: 1.6; }
 
-    .btn-accept { background-color: #2ecc71; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
-    .btn-reject { background-color: #e74c3c; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+    .btn-accept { background-color: #2ecc71; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .btn-reject { background-color: #e74c3c; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .btn-accept:hover { background-color: #27ae60; }
+    .btn-reject:hover { background-color: #c0392b; }
 
     .offer-status { padding: 5px 10px; border-radius: 5px; font-size: 0.9em; font-weight: bold; text-transform: uppercase; color: #fff; }
     .status-pending { background-color: #f39c12; border-color: #f39c12; }
@@ -179,8 +204,14 @@
     .transaction-status-info.status-cancelled { background-color: rgba(149, 165, 166, 0.2); border-color: #95a5a6; }
     .transaction-status-info.status-completed { background-color: rgba(52, 152, 219, 0.2); border-color: #3498db; }
 
+    /* Kotak aksi khusus untuk tombol "Pesanan Diterima" */
     .transaction-actions.received-action {
         background: rgba(46, 204, 113, 0.1);
         border: 1px solid #2ecc71;
+    }
+
+    /* Responsif */
+    @media (max-width: 768px) {
+        .transaction-grid { grid-template-columns: 1fr; }
     }
 </style>
