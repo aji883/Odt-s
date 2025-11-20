@@ -4,13 +4,14 @@ const Item = require('./Item'); // Kita butuh Item model
 class Transaction {
 
     // ==========================================
-    // 1. FUNGSI DATABASE MURNI (MODEL)
+    // 1. FUNGSI DATABASE (MODEL)
     // ==========================================
 
     /**
      * Membuat tawaran baru (buy/swap)
      */
     static async create(data) {
+        // Ambil kolom baru untuk alamat & pembayaran
         const { itemId, proposerUserId, ownerUserId, type, message, shipping_address, payment_method, payment_proof_url } = data;
         const sql = `INSERT INTO transactions (item_id, proposer_user_id, owner_user_id, type, message, status, shipping_address, payment_method, payment_proof_url)
                      VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)`;
@@ -128,7 +129,7 @@ class Transaction {
     // ==========================================
 
     /**
-     * @desc    [BELI - STEP 1] Menampilkan halaman checkout
+     * @desc    [BELI - STEP 1] Menampilkan halaman checkout (form alamat/pembayaran)
      * @route   GET /transactions/buy/:itemId
      */
     static async handleGetCheckoutPage(req, res) {
@@ -164,7 +165,7 @@ class Transaction {
     }
 
     /**
-     * @desc    [BELI - STEP 2] Memproses pembelian
+     * @desc    [BELI - STEP 2] Memproses pembelian setelah user isi form
      * @route   POST /transactions/buy/:itemId
      */
     static async handleConfirmPurchase(req, res) {
@@ -289,7 +290,7 @@ class Transaction {
     }
     
     /**
-     * @desc    Menampilkan Halaman Detail Transaksi
+     * @desc    Menampilkan Halaman Detail Transaksi (untuk konfirmasi / pilih item)
      * @route   GET /transactions/:id
      */
     static async handleGetTransactionDetail(req, res) {
@@ -303,6 +304,7 @@ class Transaction {
             if (!isOwner && !isProposer) return res.status(403).send('Akses ditolak.');
             
             let itemsForSwap = [];
+            // Logika ini dipindahkan ke handleSelectSwapPage, tapi tidak apa-apa jika tetap di sini
             if (transaction.type === 'swap' && isProposer && !transaction.offered_item_id) {
                 itemsForSwap = await Item.findSwappableByUserId(req.session.userId);
             }
@@ -310,7 +312,7 @@ class Transaction {
             // Cek status favorit
             let isFavorited = false;
             if (req.session.userId) {
-                const Favorite = require('./Favorite');
+                const Favorite = require('./Favorite'); // Impor di sini untuk menghindari circular dependency
                 isFavorited = await Favorite.check(req.session.userId, transaction.item_main_id);
             }
 
@@ -319,7 +321,7 @@ class Transaction {
                 transaction: transaction,
                 isOwner: isOwner,
                 isProposer: isProposer,
-                itemsForSwap: itemsForSwap,
+                itemsForSwap: itemsForSwap, // itemsForSwap akan kosong jika item sudah dipilih
                 bodyClass: 'page-profile',
                 isFavorited: isFavorited
             });
@@ -514,32 +516,36 @@ class Transaction {
     }
     
     /**
-     * @desc    Penawar mengonfirmasi pesanan telah diterima (Menyelesaikan Transaksi)
-     * @route   POST /transactions/:id/complete
+     * [BARU] Penawar mengonfirmasi pesanan telah diterima (TRANSAKSI SELESAI)
+     * - Ubah status transaksi jadi 'completed'
+     * - Ubah status Item Utama jadi 'Terjual'
+     * - Ubah status Item Penukar (jika ada) jadi 'Terjual'
      */
     static async handleCompleteTransaction(req, res) {
         try {
             const transactionId = req.params.id;
             const userId = req.session.userId;
 
-            const transaction = await Transaction.findById(transactionId);
-            if (!transaction) {
-                return res.status(404).send('Transaksi tidak ditemukan.');
-            }
-            if (transaction.proposer_user_id !== userId) {
-                return res.status(403).send('Akses ditolak.');
-            }
-            if (transaction.status !== 'accepted') {
-                return res.status(400).send('Tawaran ini belum diterima oleh penjual.');
-            }
+            // Gunakan getFullDetailById agar kita dapat data item
+            const transaction = await Transaction.getFullDetailById(transactionId);
+            
+            if (!transaction) return res.status(404).send('Transaksi tidak ditemukan.');
+            if (transaction.proposer_user_id !== userId) return res.status(403).send('Akses ditolak.');
+            if (transaction.status !== 'accepted') return res.status(400).send('Tawaran ini belum diterima oleh penjual.');
 
             // 1. Update status Transaksi
             await Transaction.updateStatus(transactionId, 'completed');
             
-            // 2. [BARU] Update status Item menjadi 'Terjual'
-            // (Memastikan fungsi updateItemStatus ada di Item model sebelum dipanggil)
+            // 2. Update status Item Utama menjadi 'Terjual'
             if (Item.updateItemStatus) {
                 await Item.updateItemStatus(transaction.item_id, 'Terjual');
+            }
+            
+            // 3. Update status Item Penawar (jika swap) menjadi 'Terjual'
+            if (transaction.type === 'swap' && transaction.offered_item_id) {
+                if (Item.updateItemStatus) {
+                    await Item.updateItemStatus(transaction.offered_item_id, 'Terjual');
+                }
             }
             
             res.redirect(`/transactions/${transactionId}`);
